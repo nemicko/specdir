@@ -1,0 +1,32 @@
+name: Validate Registry
+
+on:
+  pull_request:
+    paths:
+      - 'registry.yaml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate registry entries
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install js-yaml node-fetch
+
+      - name: Validate registry.yaml
+        run: node .github/scripts/validate-registry.js
+
+      - name: Check URLs are reachable
+        run: node .github/scripts/check-urls.js
+
+      - name: Validate Spectral format
+        run: node .github/scripts/validate-spectral.js

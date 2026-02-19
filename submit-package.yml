@@ -1,0 +1,55 @@
+name: Submit Package
+description: Request to list a new Spectral package in specdir
+title: "Add: spectral-"
+labels: ["new-package"]
+
+body:
+  - type: input
+    id: package-name
+    attributes:
+      label: Package name
+      placeholder: spectral-payments
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: Spec URL
+      description: The stable public URL where your Spectral package lives
+      placeholder: https://yourdomain.com/spectral/payments
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: One sentence describing what domain this spec covers (max 120 chars)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: maturity
+    attributes:
+      label: Maturity
+      options:
+        - draft
+        - beta
+        - stable
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: My URL is publicly reachable
+          required: true
+        - label: My spec is valid Spectral format
+          required: true
+        - label: My domain in the entry matches the URL domain
+          required: true
+        - label: I have read CONTRIBUTING.md
+          required: true
