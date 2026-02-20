@@ -6,6 +6,9 @@ const yaml = require('js-yaml');
 const raw = fs.readFileSync('./registry.yaml', 'utf8');
 const registry = yaml.load(raw);
 const packages = registry.packages || [];
+const promptTemplate = fs.existsSync('./prompts/implement.md')
+  ? fs.readFileSync('./prompts/implement.md', 'utf8')
+  : '';
 
 const maturityStyle = {
   draft:      'background:#6b7280;color:#fff',
@@ -13,6 +16,11 @@ const maturityStyle = {
   stable:     'background:#16a34a;color:#fff',
   deprecated: 'background:#dc2626;color:#fff',
 };
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
 
 const css = `
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -54,6 +62,13 @@ const css = `
   .btn { padding: 0.6rem 1.25rem; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 500; }
   .btn-primary { background: #0284c7; color: #fff; }
   .btn-secondary { background: #f1f5f9; color: #0f172a; border: 1px solid #e2e8f0; }
+  .prompt-wrap { position: relative; }
+  .prompt-wrap pre { max-height: 400px; overflow-y: auto; }
+  .copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; padding: 0.35rem 0.75rem; border: 1px solid #475569; border-radius: 6px; background: #334155; color: #e2e8f0; font-size: 0.78rem; cursor: pointer; }
+  .copy-btn:hover { background: #475569; }
+  .pkg-header { margin-bottom: 2rem; }
+  .pkg-header h2 { margin-bottom: 0.25rem; }
+  .pkg-meta { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-top: 0.5rem; }
 `;
 
 function layout(title, activePage, content) {
@@ -108,6 +123,10 @@ const homePage = layout('Home', 'home', `
   - https://raw.githubusercontent.com/spectral-protocol/specdir/main/packages/juice.users/index.spectral</code></pre>
   <p>Then tell your AI agent: <em>"Integrate the juice.users package from the dependency URL into this application."</em> The agent fetches the spec, reads the nodes, and implements it against your stack.</p>
 
+  <h2>Implementing with AI</h2>
+  <p>Every package page includes a ready-to-use prompt. Copy it into any AI coding tool to generate a full-stack implementation from the spec.</p>
+  <p><a href="/packages/juice.users/">Try it with juice.users &rarr;</a></p>
+
   <h2>For AI Agents</h2>
   <p>Fetch the full registry programmatically:</p>
   <pre><code>GET https://specdir.com/registry.yaml
@@ -117,7 +136,7 @@ GET https://specdir.com/registry.json</code></pre>
 // DIRECTORY PAGE
 const rows = packages.map(pkg => `
   <tr>
-    <td><a href="${pkg.url}" target="_blank">${pkg.name}</a></td>
+    <td><a href="/packages/${pkg.name}/">${pkg.name}</a></td>
     <td>${pkg.description}</td>
     <td>${pkg.author}</td>
     <td>${(pkg.tags || []).map(t => `<span class="tag">${t}</span>`).join(' ')}</td>
@@ -193,6 +212,66 @@ const specPage = layout('Protocol Spec', 'spec', `
   </div>
 `);
 
+// PACKAGE PAGES
+function generatePackagePage(pkg) {
+  const baseUrl = pkg.url.replace(/\/[^/]+$/, '');
+  const nodeFiles = ['model.spectral', 'views.spectral', 'interactions.spectral', 'interfaces.spectral'];
+  const nodesRows = nodeFiles.map(f =>
+    `<tr><td><a href="${baseUrl}/${f}" target="_blank">${f}</a></td></tr>`
+  ).join('');
+
+  const prompt = promptTemplate
+    ? escapeHtml(promptTemplate.replace(/\{\{PACKAGE_URL\}\}/g, pkg.url))
+    : '';
+
+  const promptSection = prompt ? `
+    <h2>Implement with AI</h2>
+    <p>Copy this prompt into any AI coding tool (Claude Code, Codex, Cursor) to generate a full-stack implementation from this spec.</p>
+    <div class="prompt-wrap">
+      <button class="copy-btn" onclick="copyPrompt()">Copy</button>
+      <pre id="prompt-text"><code>${prompt}</code></pre>
+    </div>
+    <script>
+      function copyPrompt() {
+        const text = document.getElementById('prompt-text').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          const btn = document.querySelector('.copy-btn');
+          btn.textContent = 'Copied!';
+          setTimeout(() => btn.textContent = 'Copy', 2000);
+        });
+      }
+    </script>
+  ` : '';
+
+  return layout(pkg.name, 'directory', `
+    <div class="pkg-header">
+      <h2>${escapeHtml(pkg.name)}</h2>
+      <p>${escapeHtml(pkg.description)}</p>
+      <div class="pkg-meta">
+        <span>by <strong>${escapeHtml(pkg.author)}</strong></span>
+        <span class="badge" style="${maturityStyle[pkg.maturity] || ''}">${pkg.maturity}</span>
+        ${(pkg.tags || []).map(t => `<span class="tag">${t}</span>`).join(' ')}
+      </div>
+    </div>
+
+    <h2>Nodes</h2>
+    <table>
+      <thead><tr><th>File</th></tr></thead>
+      <tbody>
+        <tr><td><a href="${pkg.url}" target="_blank">index.spectral</a></td></tr>
+        ${nodesRows}
+      </tbody>
+    </table>
+
+    <h2>Usage</h2>
+    <p>Add to your <code>.spectral</code> file dependencies:</p>
+    <pre><code>dependencies:
+  - ${pkg.url}</code></pre>
+
+    ${promptSection}
+  `);
+}
+
 // Write files
 fs.mkdirSync('./dist', { recursive: true });
 fs.mkdirSync('./dist/directory', { recursive: true });
@@ -202,8 +281,14 @@ fs.writeFileSync('./dist/index.html', homePage);
 fs.writeFileSync('./dist/directory/index.html', directoryPage);
 fs.writeFileSync('./dist/spec/index.html', specPage);
 
+for (const pkg of packages) {
+  const pkgDir = `./dist/packages/${pkg.name}`;
+  fs.mkdirSync(pkgDir, { recursive: true });
+  fs.writeFileSync(`${pkgDir}/index.html`, generatePackagePage(pkg));
+}
+
 if (fs.existsSync('./CNAME')) {
   fs.copyFileSync('./CNAME', './dist/CNAME');
 }
 
-console.log(`Generated site: home + directory (${packages.length} packages) + spec`);
+console.log(`Generated site: home + directory (${packages.length} packages) + spec + ${packages.length} package page(s)`);

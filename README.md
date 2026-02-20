@@ -48,6 +48,17 @@ The agent fetches the spec, reads the nodes, understands the domain, and impleme
 
 ---
 
+## Implementing with AI
+
+Every package page on specdir.com includes a ready-to-use AI prompt.
+Copy it into any AI coding tool (Claude Code, Codex, Cursor) to generate a full implementation:
+
+> [Implement juice.users](https://specdir.com/packages/juice.users/)
+
+Or use the universal template from [prompts/implement.md](./prompts/implement.md) — replace `{{PACKAGE_URL}}` with your package URL.
+
+---
+
 ## Publishing a Package
 
 Anyone can list a Spectral package in this directory.

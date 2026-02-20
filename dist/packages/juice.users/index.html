@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>juice.users — specdir.com</title>
+  <style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1a1a1a; background: #fafafa; }
+  header { background: #0f172a; color: #f8fafc; padding: 2rem; }
+  header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
+  header h1 span { color: #38bdf8; }
+  header p { margin-top: 0.5rem; color: #94a3b8; font-size: 0.95rem; }
+  nav { display: flex; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap; }
+  nav a { color: #38bdf8; text-decoration: none; font-size: 0.9rem; }
+  nav a:hover { text-decoration: underline; }
+  nav a.active { color: #fff; font-weight: 600; }
+  main { max-width: 1000px; margin: 2rem auto; padding: 0 1.5rem; }
+  h2 { font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem; color: #0f172a; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 1.5rem 0 0.5rem; color: #0f172a; }
+  p { color: #475569; line-height: 1.7; margin-bottom: 1rem; }
+  a { color: #0284c7; }
+  pre { background: #1e293b; color: #e2e8f0; padding: 1rem 1.25rem; border-radius: 8px; overflow-x: auto; font-size: 0.85rem; margin-bottom: 1rem; }
+  code { font-family: 'Fira Code', monospace; }
+  .search { margin-bottom: 1.5rem; }
+  .search input { width: 100%; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem; outline: none; }
+  .search input:focus { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,0.15); }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: 1.5rem; }
+  th { background: #f1f5f9; padding: 0.75rem 1rem; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; }
+  td { padding: 0.85rem 1rem; border-top: 1px solid #f1f5f9; font-size: 0.92rem; vertical-align: top; }
+  td a { color: #0284c7; text-decoration: none; font-weight: 500; }
+  td a:hover { text-decoration: underline; }
+  tr:hover td { background: #f8fafc; }
+  .tag { background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 99px; font-size: 0.75rem; margin-right: 4px; display: inline-block; }
+  .badge { padding: 2px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+  .meta { margin-top: 2rem; color: #94a3b8; font-size: 0.82rem; text-align: center; padding-bottom: 3rem; }
+  .hero { background: #fff; border-radius: 12px; padding: 2rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: 2rem; }
+  .hero h2 { margin-bottom: 0.75rem; }
+  .nodes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .node { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; }
+  .node strong { display: block; color: #0f172a; margin-bottom: 0.25rem; font-size: 0.9rem; }
+  .node span { color: #64748b; font-size: 0.82rem; }
+  .actions { display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; }
+  .btn { padding: 0.6rem 1.25rem; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+  .btn-primary { background: #0284c7; color: #fff; }
+  .btn-secondary { background: #f1f5f9; color: #0f172a; border: 1px solid #e2e8f0; }
+  .prompt-wrap { position: relative; }
+  .prompt-wrap pre { max-height: 400px; overflow-y: auto; }
+  .copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; padding: 0.35rem 0.75rem; border: 1px solid #475569; border-radius: 6px; background: #334155; color: #e2e8f0; font-size: 0.78rem; cursor: pointer; }
+  .copy-btn:hover { background: #475569; }
+  .pkg-header { margin-bottom: 2rem; }
+  .pkg-header h2 { margin-bottom: 0.25rem; }
+  .pkg-meta { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-top: 0.5rem; }
+</style>
+</head>
+<body>
+  <header>
+    <h1><a href="/" style="color:inherit;text-decoration:none">spec<span>dir</span>.com</a></h1>
+    <p>The home of the Spectral Protocol and open directory of domain specifications.</p>
+    <nav>
+      <a href="/" class="">Home</a>
+      <a href="/directory" class="active">Directory</a>
+      <a href="/spec" class="">Protocol Spec</a>
+      <a href="https://github.com/spectral-protocol/specdir">GitHub</a>
+      <a href="/registry.json">registry.json</a>
+    </nav>
+  </header>
+  <main>
+    
+    <div class="pkg-header">
+      <h2>juice.users</h2>
+      <p>User identity, authentication, roles and lifecycle management.</p>
+      <div class="pkg-meta">
+        <span>by <strong>juice</strong></span>
+        <span class="badge" style="background:#6b7280;color:#fff">draft</span>
+        <span class="tag">identity</span> <span class="tag">auth</span> <span class="tag">admin</span> <span class="tag">core</span>
+      </div>
+    </div>
+
+    <h2>Nodes</h2>
+    <table>
+      <thead><tr><th>File</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://raw.githubusercontent.com/spectral-protocol/specdir/main/packages/juice.users/index.spectral" target="_blank">index.spectral</a></td></tr>
+        <tr><td><a href="https://raw.githubusercontent.com/spectral-protocol/specdir/main/packages/juice.users/model.spectral" target="_blank">model.spectral</a></td></tr><tr><td><a href="https://raw.githubusercontent.com/spectral-protocol/specdir/main/packages/juice.users/views.spectral" target="_blank">views.spectral</a></td></tr><tr><td><a href="https://raw.githubusercontent.com/spectral-protocol/specdir/main/packages/juice.users/interactions.spectral" target="_blank">interactions.spectral</a></td></tr><tr><td><a href="https://raw.githubusercontent.com/spectral-protocol/specdir/main/packages/juice.users/interfaces.spectral" target="_blank">interfaces.spectral</a></td></tr>
+      </tbody>
+    </table>
+
+    <h2>Usage</h2>
+    <p>Add to your <code>.spectral</code> file dependencies:</p>
+    <pre><code>dependencies:
+  - https://raw.githubusercontent.com/spectral-protocol/specdir/main/packages/juice.users/index.spectral</code></pre>
+
+    
+    <h2>Implement with AI</h2>
+    <p>Copy this prompt into any AI coding tool (Claude Code, Codex, Cursor) to generate a full-stack implementation from this spec.</p>
+    <div class="prompt-wrap">
+      <button class="copy-btn" onclick="copyPrompt()">Copy</button>
+      <pre id="prompt-text"><code># Implement a Spectral Package
+
+You are implementing a Spectral domain specification — either as a new application or as a module added to an existing one. Spectral is an open protocol that describes application domains in YAML — data models, views, interactions, and interfaces — independent of any framework or language. Your job is to read the spec and generate a complete, working implementation of the domain.
+
+## Step 1: Read the Protocol
+
+Fetch and read the Spectral protocol spec to understand the type system, node anatomy, reference syntax, and field modifiers:
+
+```
+https://raw.githubusercontent.com/spectral-protocol/specdir/main/spec/README.md
+```
+
+## Step 2: Fetch the Package
+
+Fetch the package entry point:
+
+```
+https://raw.githubusercontent.com/spectral-protocol/specdir/main/packages/juice.users/index.spectral
+```
+
+The entry point lists the node files. Fetch each one from the same directory:
+
+- `model.spectral` — fields, types, constraints, relations
+- `views.spectral` — table, detail, form, card presentation definitions
+- `interactions.spectral` — actions, preconditions, permissions, events
+- `interfaces.spectral` — REST endpoints and MCP exposure
+
+Read all four files completely before generating any code.
+
+## Step 3: Confirm the Stack
+
+Before generating, ask the user:
+
+1. **Language** — TypeScript, Python, Go, etc.
+2. **Backend framework** — Express, Fastify, Django, Gin, etc.
+3. **Frontend framework** — React, Angular, Vue, Svelte, etc.
+4. **ORM / database layer** — Prisma, Drizzle, SQLAlchemy, GORM, etc.
+5. **UI component library** — shadcn/ui, Material UI, Tailwind, etc.
+
+Use sensible defaults if the user says &quot;your choice&quot; (e.g. TypeScript, Express, React, Prisma, Tailwind).
+
+## Step 4: Generate
+
+Map each Spectral node to implementation code:
+
+### From `model.spectral`
+
+- **Type/interface definition** — one type per model with all fields
+- **Database schema** — ORM model or migration matching fields, types, and constraints
+- **Validation schema** — Zod, Yup, or equivalent matching `required`, `min`, `max`, `pattern`, `unique`
+- **Relations** — foreign keys or join tables for `hasOne`, `hasMany`, `belongsTo`
+- **Semantic types** — map `email` to email validation, `uuid` to UUID generation, `url` to URL validation, `locale` to locale codes, etc.
+
+### From `views.spectral`
+
+- **Table view** — data table component with columns matching the spec: labels, sort, filter, search, pagination, display hints (`avatar`, `badge`, `date-relative`)
+- **Detail view** — profile/detail page following the layout, header, and sections from the spec
+- **Form variants** — one form per variant (`create`, `edit`); respect `inherits`, `exclude`, `add`, `editable`, `restricted` fields
+- **Card view** — compact component with the specified fields and click action
+
+### From `interactions.spectral`
+
+- **One handler per action** — `create`, `invite`, `suspend`, `reactivate`, `delete`, `edit`, `change_role`
+- **Input validation** — validate input fields listed in the spec
+- **Preconditions** — enforce `requires` rules (e.g. status checks) before executing
+- **Permissions** — enforce `restricted` roles; handle `self` access where specified
+- **Confirmation** — implement confirmation dialogs where `confirmation: true`
+- **Outcomes** — on success: apply state changes, emit events, navigate if specified; on failure: display errors
+- **Events** — emit all declared events; create an event bus or hook system
+
+### From `interfaces.spectral`
+
+- **REST routes** — one route per endpoint matching method, path, query params, auth, and role requirements
+- **Auth middleware** — enforce `auth: required` and role checks per endpoint
+- **Request/response shaping** — respect `include`, `exclude`, `accepts`, `returns` directives
+- **MCP stubs** — generate placeholder MCP handler that serves spec nodes alongside data (comment with TODO for full MCP implementation)
+
+## Generation Principles
+
+Follow these rules strictly:
+
+1. **Immutability** — fields marked `immutable: true` must not be editable after creation. Enforce in update handlers and edit forms.
+2. **Generated fields** — fields marked `generated: true` must be system-assigned (UUIDs, timestamps). Never accept from user input.
+3. **Constraints** — implement every constraint from the `constraints` block as validation logic or middleware.
+4. **Default values** — apply `default` values in schema and form initialization.
+5. **Events** — every interaction outcome that says `emit:` must fire a named event. Wire up an event system.
+6. **Permissions** — `restricted: [admin]` means admin only. `restricted: [admin, self]` means admin or the user themselves. Implement both paths.
+7. **View fidelity** — render exactly the columns, sections, and fields the spec declares. Don't add or remove UI elements.
+8. **Form inheritance** — when a form variant says `inherits: create`, start from the create variant fields, then apply `exclude` and `add`.
+9. **Cross-domain stubs** — for `@profile.model`, `@roles.model`, `@auth.interfaces`, and other unresolved references, generate typed stubs with TODO comments.
+10. **Semantic type mapping** — `email` gets email validation, `uuid` gets UUID v4 generation, `url` gets URL validation, `locale` gets locale code validation, `enum` gets the exact `values` list.
+
+## If You Cannot Fetch URLs
+
+If your environment doesn't support fetching URLs, ask the user to paste the contents of:
+
+1. The protocol spec (`spec/README.md`)
+2. The package entry point (`index.spectral`)
+3. Each node file (`model.spectral`, `views.spectral`, `interactions.spectral`, `interfaces.spectral`)
+
+Then proceed with generation using the pasted content.
+</code></pre>
+    </div>
+    <script>
+      function copyPrompt() {
+        const text = document.getElementById('prompt-text').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          const btn = document.querySelector('.copy-btn');
+          btn.textContent = 'Copied!';
+          setTimeout(() => btn.textContent = 'Copy', 2000);
+        });
+      }
+    </script>
+  
+  
+  </main>
+</body>
+</html>

@@ -38,3 +38,8 @@ This package references but does not include:
 - `@roles.model` — fine-grained role assignments
 - `@auth.interfaces` — token validation
 - `@storage.interfaces` — avatar uploads
+
+## Implement with AI
+
+Copy the implementation prompt from the [package page](https://specdir.com/packages/juice.users/)
+into any AI coding tool to generate a full-stack implementation.
