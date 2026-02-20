@@ -7,7 +7,7 @@
 2. **Add your entry to `registry.yaml`**
 
    ```yaml
-   - name: your-package-name
+   - name: publisher.packagename
      description: "One sentence describing what domain this covers."
      author: Your Name or Org
      domain: yourdomain.com
@@ -22,10 +22,10 @@
    - Your spec must be valid Spectral format (CI will validate automatically)
    - The `domain` field must match the domain in your `url`
    - Package name must be unique in the registry
-   - Package name must follow the pattern: `spectral-[domain-name]`
+   - Package name must follow the pattern: `publisher.domain` (lowercase alphanumeric, dot separator)
 
 4. **Open a Pull Request**
-   - Title: `Add: spectral-yourpackage`
+   - Title: `Add: publisher.yourpackage`
    - Include a brief description of what domain the spec covers
    - CI will automatically validate your spec URL and format
 
@@ -48,7 +48,7 @@ Open a PR with the change to your entry in `registry.yaml`.
 
 ## Removing a Package
 
-Open an issue with title `Remove: spectral-yourpackage` and reason.
+Open an issue with title `Remove: publisher.yourpackage` and reason.
 
 Packages are not hard-deleted — they are marked `deprecated` with a forwarding URL where possible, preserving history.
 
@@ -56,7 +56,7 @@ Packages are not hard-deleted — they are marked `deprecated` with a forwarding
 
 ## Validation Rules (enforced by CI)
 
-- `name` — required, unique, matches `spectral-[a-z0-9-]+`
+- `name` — required, unique, matches `publisher.domain` (lowercase alphanumeric, dot separator)
 - `description` — required, max 120 characters
 - `author` — required
 - `domain` — required, must match URL domain

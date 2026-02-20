@@ -5,7 +5,7 @@ const yaml = require('js-yaml');
 
 const REQUIRED_FIELDS = ['name', 'description', 'author', 'domain', 'url', 'tags', 'maturity', 'submitted'];
 const VALID_MATURITY = ['draft', 'beta', 'stable', 'deprecated'];
-const NAME_PATTERN = /^spectral-[a-z0-9-]+$/;
+const NAME_PATTERN = /^[a-z][a-z0-9]*\.[a-z][a-z0-9]*$/;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 let errors = [];
@@ -34,7 +34,7 @@ try {
     }
 
     if (pkg.name && !NAME_PATTERN.test(pkg.name)) {
-      error(id, `name must match spectral-[a-z0-9-]+ got "${pkg.name}"`);
+      error(id, `name must match publisher.domain (lowercase alphanumeric, dot separator) — got "${pkg.name}"`);
     }
 
     if (pkg.name) {
@@ -63,7 +63,9 @@ try {
       try {
         const urlDomain = new URL(pkg.url).hostname.replace(/^www\./, '');
         const declared = pkg.domain.replace(/^www\./, '');
-        if (!urlDomain.endsWith(declared) && !declared.endsWith(urlDomain)) {
+        const isSelfHosted = urlDomain === 'raw.githubusercontent.com'
+          && pkg.url.includes('spectral-protocol/specdir');
+        if (!isSelfHosted && !urlDomain.endsWith(declared) && !declared.endsWith(urlDomain)) {
           error(id, `domain "${pkg.domain}" does not match URL hostname "${urlDomain}"`);
         }
       } catch {

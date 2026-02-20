@@ -54,12 +54,15 @@ function validateNode(content, url) {
   // Check node address format
   if (parsed.node) {
     const parts = parsed.node.split('.');
-    if (parts.length < 2) {
+    const isIndex = url && url.endsWith('index.spectral');
+    if (parts.length < 2 && !isIndex) {
       errors.push(`"node" must be dot-notation with at least 2 parts e.g. "users.model"`);
     }
-    const suffix = parts[parts.length - 1];
-    if (parts.length === 2 && !VALID_NODE_SUFFIXES.includes(suffix) && suffix !== parts[0]) {
-      errors.push(`unknown node type "${suffix}" — expected one of: ${VALID_NODE_SUFFIXES.join(', ')}`);
+    if (parts.length >= 2) {
+      const suffix = parts[parts.length - 1];
+      if (parts.length === 2 && !VALID_NODE_SUFFIXES.includes(suffix) && suffix !== parts[0]) {
+        errors.push(`unknown node type "${suffix}" — expected one of: ${VALID_NODE_SUFFIXES.join(', ')}`);
+      }
     }
   }
 

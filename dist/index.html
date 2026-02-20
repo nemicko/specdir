@@ -1,20 +1,10 @@
-#!/usr/bin/env node
-
-const fs = require('fs');
-const yaml = require('js-yaml');
-
-const raw = fs.readFileSync('./registry.yaml', 'utf8');
-const registry = yaml.load(raw);
-const packages = registry.packages || [];
-
-const maturityStyle = {
-  draft:      'background:#6b7280;color:#fff',
-  beta:       'background:#d97706;color:#fff',
-  stable:     'background:#16a34a;color:#fff',
-  deprecated: 'background:#dc2626;color:#fff',
-};
-
-const css = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home — specdir.com</title>
+  <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1a1a1a; background: #fafafa; }
   header { background: #0f172a; color: #f8fafc; padding: 2rem; }
@@ -54,38 +44,22 @@ const css = `
   .btn { padding: 0.6rem 1.25rem; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 500; }
   .btn-primary { background: #0284c7; color: #fff; }
   .btn-secondary { background: #f1f5f9; color: #0f172a; border: 1px solid #e2e8f0; }
-`;
-
-function layout(title, activePage, content) {
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title} — specdir.com</title>
-  <style>${css}</style>
+</style>
 </head>
 <body>
   <header>
     <h1><a href="/" style="color:inherit;text-decoration:none">spec<span>dir</span>.com</a></h1>
     <p>The home of the Spectral Protocol and open directory of domain specifications.</p>
     <nav>
-      <a href="/" class="${activePage === 'home' ? 'active' : ''}">Home</a>
-      <a href="/directory" class="${activePage === 'directory' ? 'active' : ''}">Directory</a>
-      <a href="/spec" class="${activePage === 'spec' ? 'active' : ''}">Protocol Spec</a>
+      <a href="/" class="active">Home</a>
+      <a href="/directory" class="">Directory</a>
+      <a href="/spec" class="">Protocol Spec</a>
       <a href="https://github.com/spectral-protocol/specdir">GitHub</a>
       <a href="/registry.json">registry.json</a>
     </nav>
   </header>
   <main>
-    ${content}
-  </main>
-</body>
-</html>`;
-}
-
-// HOME PAGE
-const homePage = layout('Home', 'home', `
+    
   <div class="hero">
     <h2>What is Spectral?</h2>
     <p>Spectral is an open protocol for describing application domains in a format that is both human-readable and AI-consumable. One spec. Any stack. Any AI agent.</p>
@@ -112,98 +86,7 @@ const homePage = layout('Home', 'home', `
   <p>Fetch the full registry programmatically:</p>
   <pre><code>GET https://specdir.com/registry.yaml
 GET https://specdir.com/registry.json</code></pre>
-`);
 
-// DIRECTORY PAGE
-const rows = packages.map(pkg => `
-  <tr>
-    <td><a href="${pkg.url}" target="_blank">${pkg.name}</a></td>
-    <td>${pkg.description}</td>
-    <td>${pkg.author}</td>
-    <td>${(pkg.tags || []).map(t => `<span class="tag">${t}</span>`).join(' ')}</td>
-    <td><span class="badge" style="${maturityStyle[pkg.maturity] || ''}">${pkg.maturity}</span></td>
-  </tr>`).join('');
-
-const directoryPage = layout('Directory', 'directory', `
-  <h2>Package Directory</h2>
-  <p style="margin-bottom:1.5rem">
-    ${packages.length} package(s) listed. Packages are hosted by their authors on their own domains.
-    Trust comes from the provider's domain — not from us.
-    <a href="https://github.com/spectral-protocol/specdir/blob/main/CONTRIBUTING.md">Submit a package →</a>
-  </p>
-  <div class="search">
-    <input type="text" id="search" placeholder="Search packages by name, tag, or description..." oninput="filterTable()">
-  </div>
-  <table id="registry">
-    <thead>
-      <tr>
-        <th>Package</th>
-        <th>Description</th>
-        <th>Author</th>
-        <th>Tags</th>
-        <th>Maturity</th>
-      </tr>
-    </thead>
-    <tbody>${rows}</tbody>
-  </table>
-  <p class="meta">Updated ${new Date().toISOString().split('T')[0]} &middot;
-    <a href="https://github.com/spectral-protocol/specdir">Contribute on GitHub</a>
-  </p>
-  <script>
-    function filterTable() {
-      const q = document.getElementById('search').value.toLowerCase();
-      document.querySelectorAll('#registry tbody tr').forEach(row => {
-        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
-      });
-    }
-  </script>
-`);
-
-// SPEC PAGE
-const specContent = fs.existsSync('./spec/README.md')
-  ? fs.readFileSync('./spec/README.md', 'utf8')
-  : '';
-
-// Simple markdown-ish rendering for the spec page
-function renderSpec(md) {
-  return md
-    .replace(/^# (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^---$/gm, '<hr style="border:none;border-top:1px solid #e2e8f0;margin:2rem 0">')
-    .replace(/```(\w*)\n([\s\S]*?)```/gm, '<pre><code>$2</code></pre>')
-    .replace(/`([^`]+)`/g, '<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:0.85em">$1</code>')
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/^\| (.+) \|$/gm, (line) => {
-      const cells = line.split('|').filter(c => c.trim() && !c.match(/^[-\s]+$/));
-      if (!cells.length) return '';
-      return '<tr>' + cells.map(c => `<td>${c.trim()}</td>`).join('') + '</tr>';
-    })
-    .replace(/(<tr>.*<\/tr>\n?)+/gs, m => `<table>${m}</table>`)
-    .replace(/^\→ \[(.+)\]\((.+)\)$/gm, '<p><a href="$2">→ $1</a></p>')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
-    .replace(/^(?!<[h|p|t|u|o|l|d|b|i|c|h|p|s]).+/gm, line => line.trim() ? `<p>${line}</p>` : '')
-    .replace(/<p><\/p>/g, '');
-}
-
-const specPage = layout('Protocol Spec', 'spec', `
-  <div style="background:#fff;border-radius:12px;padding:2rem;box-shadow:0 1px 4px rgba(0,0,0,0.07)">
-    ${renderSpec(specContent)}
-  </div>
-`);
-
-// Write files
-fs.mkdirSync('./dist', { recursive: true });
-fs.mkdirSync('./dist/directory', { recursive: true });
-fs.mkdirSync('./dist/spec', { recursive: true });
-
-fs.writeFileSync('./dist/index.html', homePage);
-fs.writeFileSync('./dist/directory/index.html', directoryPage);
-fs.writeFileSync('./dist/spec/index.html', specPage);
-
-if (fs.existsSync('./CNAME')) {
-  fs.copyFileSync('./CNAME', './dist/CNAME');
-}
-
-console.log(`Generated site: home + directory (${packages.length} packages) + spec`);
+  </main>
+</body>
+</html>
