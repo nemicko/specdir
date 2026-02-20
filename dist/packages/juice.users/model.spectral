@@ -1,0 +1,87 @@
+spectral: "1.0"
+node: users.model
+description: "Core user entity. Represents an authenticated human actor in the system."
+author: juice
+dependencies: []
+
+fields:
+  id:
+    type: uuid
+    required: true
+    generated: true
+    immutable: true
+
+  email:
+    type: email
+    required: true
+    unique: true
+    immutable: true
+    description: "Primary identifier for login and communication."
+
+  username:
+    type: string
+    required: false
+    unique: true
+    min: 3
+    max: 32
+    pattern: "^[a-zA-Z0-9_]+$"
+
+  displayName:
+    type: string
+    required: true
+    min: 1
+    max: 64
+
+  avatarUrl:
+    type: url
+    required: false
+
+  role:
+    type: enum
+    required: true
+    default: member
+    values: [admin, member, guest]
+    description: "Primary access role. Fine-grained permissions handled by @roles.model."
+
+  status:
+    type: enum
+    required: true
+    default: active
+    values: [active, suspended, pending, deleted]
+
+  locale:
+    type: locale
+    required: false
+    default: "en"
+
+  createdAt:
+    type: datetime
+    required: true
+    generated: true
+    immutable: true
+
+  updatedAt:
+    type: datetime
+    required: true
+    generated: true
+
+relations:
+  profile:
+    node: "@profile.model"
+    type: hasOne
+    description: "Extended user profile. Optional, loaded on demand."
+
+  roles:
+    node: "@roles.model"
+    type: hasMany
+    description: "Fine-grained role assignments."
+
+constraints:
+  - "A user with status:deleted must not be resolvable by any interface."
+  - "email must be verified before status transitions from pending to active."
+  - "Only admin role may modify the role field."
+
+immutability:
+  - id
+  - email
+  - createdAt

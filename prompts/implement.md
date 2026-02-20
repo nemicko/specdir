@@ -7,7 +7,7 @@ You are implementing a Spectral domain specification — either as a new applica
 Fetch and read the Spectral protocol spec to understand the type system, node anatomy, reference syntax, and field modifiers:
 
 ```
-https://raw.githubusercontent.com/spectral-protocol/specdir/main/spec/README.md
+https://specdir.com/spec
 ```
 
 ## Step 2: Fetch the Package

@@ -63,9 +63,8 @@ try {
       try {
         const urlDomain = new URL(pkg.url).hostname.replace(/^www\./, '');
         const declared = pkg.domain.replace(/^www\./, '');
-        const isSelfHosted = urlDomain === 'raw.githubusercontent.com'
-          && pkg.url.includes('spectral-protocol/specdir');
-        if (!isSelfHosted && !urlDomain.endsWith(declared) && !declared.endsWith(urlDomain)) {
+        const isGithubMirrorForSpecdir = declared === 'specdir.com' && urlDomain === 'raw.githubusercontent.com';
+        if (!isGithubMirrorForSpecdir && !urlDomain.endsWith(declared) && !declared.endsWith(urlDomain)) {
           error(id, `domain "${pkg.domain}" does not match URL hostname "${urlDomain}"`);
         }
       } catch {

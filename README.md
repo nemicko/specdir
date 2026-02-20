@@ -37,7 +37,7 @@ In any `.spectral` file, reference a package by its URL:
 
 ```yaml
 dependencies:
-  - https://raw.githubusercontent.com/spectral-protocol/specdir/main/packages/juice.users/index.spectral
+  - https://specdir.com/packages/juice.users/index.spectral
 ```
 
 Tell your AI agent to integrate it:
@@ -69,7 +69,7 @@ Anyone can list a Spectral package in this directory.
 3. The `domain` field must match the URL domain
 
 → [Read the contribution guide](./CONTRIBUTING.md)
-→ [Submit via Pull Request](https://github.com/spectral-protocol/specdir/pulls)
+→ [Submit via Pull Request](https://github.com/nemicko/specdir/pulls)
 
 ---
 

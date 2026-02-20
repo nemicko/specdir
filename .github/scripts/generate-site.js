@@ -2,6 +2,9 @@
 
 const fs = require('fs');
 const yaml = require('js-yaml');
+const path = require('path');
+
+const REPO_URL = 'https://github.com/nemicko/specdir';
 
 const raw = fs.readFileSync('./registry.yaml', 'utf8');
 const registry = yaml.load(raw);
@@ -20,6 +23,12 @@ const maturityStyle = {
 function escapeHtml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;')
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function copyLocalPackageFiles(pkgName, targetDir) {
+  const sourceDir = path.join('.', 'packages', pkgName);
+  if (!fs.existsSync(sourceDir)) return;
+  fs.cpSync(sourceDir, targetDir, { recursive: true });
 }
 
 const css = `
@@ -88,7 +97,7 @@ function layout(title, activePage, content) {
       <a href="/" class="${activePage === 'home' ? 'active' : ''}">Home</a>
       <a href="/directory" class="${activePage === 'directory' ? 'active' : ''}">Directory</a>
       <a href="/spec" class="${activePage === 'spec' ? 'active' : ''}">Protocol Spec</a>
-      <a href="https://github.com/spectral-protocol/specdir">GitHub</a>
+      <a href="${REPO_URL}">GitHub</a>
       <a href="/registry.json">registry.json</a>
     </nav>
   </header>
@@ -113,14 +122,14 @@ const homePage = layout('Home', 'home', `
     <div class="actions">
       <a href="/spec" class="btn btn-primary">Read the Protocol Spec</a>
       <a href="/directory" class="btn btn-secondary">Browse Packages</a>
-      <a href="https://github.com/spectral-protocol/specdir/blob/main/CONTRIBUTING.md" class="btn btn-secondary">Publish a Package</a>
+      <a href="${REPO_URL}/blob/main/CONTRIBUTING.md" class="btn btn-secondary">Publish a Package</a>
     </div>
   </div>
 
   <h2>Using a Package</h2>
   <p>Reference any Spectral package by URL in your <code>.spectral</code> file:</p>
   <pre><code>dependencies:
-  - https://raw.githubusercontent.com/spectral-protocol/specdir/main/packages/juice.users/index.spectral</code></pre>
+  - https://specdir.com/packages/juice.users/index.spectral</code></pre>
   <p>Then tell your AI agent: <em>"Integrate the juice.users package from the dependency URL into this application."</em> The agent fetches the spec, reads the nodes, and implements it against your stack.</p>
 
   <h2>Implementing with AI</h2>
@@ -148,7 +157,7 @@ const directoryPage = layout('Directory', 'directory', `
   <p style="margin-bottom:1.5rem">
     ${packages.length} package(s) listed. Packages are hosted by their authors on their own domains.
     Trust comes from the provider's domain — not from us.
-    <a href="https://github.com/spectral-protocol/specdir/blob/main/CONTRIBUTING.md">Submit a package →</a>
+    <a href="${REPO_URL}/blob/main/CONTRIBUTING.md">Submit a package →</a>
   </p>
   <div class="search">
     <input type="text" id="search" placeholder="Search packages by name, tag, or description..." oninput="filterTable()">
@@ -166,7 +175,7 @@ const directoryPage = layout('Directory', 'directory', `
     <tbody>${rows}</tbody>
   </table>
   <p class="meta">Updated ${new Date().toISOString().split('T')[0]} &middot;
-    <a href="https://github.com/spectral-protocol/specdir">Contribute on GitHub</a>
+    <a href="${REPO_URL}">Contribute on GitHub</a>
   </p>
   <script>
     function filterTable() {
@@ -284,6 +293,7 @@ fs.writeFileSync('./dist/spec/index.html', specPage);
 for (const pkg of packages) {
   const pkgDir = `./dist/packages/${pkg.name}`;
   fs.mkdirSync(pkgDir, { recursive: true });
+  copyLocalPackageFiles(pkg.name, pkgDir);
   fs.writeFileSync(`${pkgDir}/index.html`, generatePackagePage(pkg));
 }
 
