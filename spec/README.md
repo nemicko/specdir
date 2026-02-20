@@ -1,10 +1,22 @@
 # The Spectral Protocol
 
-Spectral is an open protocol for describing application domains in a format that is both human-readable and AI-consumable.
+Spectral is an open protocol for describing one business context of an app in a format both people and AI can understand.
 
 ## Core Idea
 
-A Spectral spec describes **what a domain is** — not how it is implemented. The same spec can generate an Angular frontend, a Node.js backend, a REST API, or a GraphQL schema. It can also travel with data at runtime via MCP, telling consuming AI agents how to present and interact with that data without additional configuration.
+A Spectral Domain is a complete application context.
+
+A Spectral spec describes **what a context is** — not which framework you use.
+In Spectral, "domain" means a bounded context of domain knowledge (for example: users, billing, orders).
+
+No-code tools help non-coders build fast, but coding teams still need shared context they can move across stacks and tools.
+Spectral gives that shared context a portable format.
+
+Think of it like this:
+- Your code is the building.
+- Spectral is the blueprint.
+
+The same spec can drive an Angular frontend, a Node.js backend, a REST API, or a GraphQL schema. It can also travel with data at runtime via MCP, so AI agents know what data is arriving and how to display and interact with it correctly.
 
 Code is generated output. The spec is the truth.
 
@@ -12,7 +24,7 @@ Code is generated output. The spec is the truth.
 
 ## Node Types
 
-Every Spectral domain is described across four node types. Each node is a separate `.spectral` file.
+Every Spectral domain context is described across four node types. Each node is a separate `.spectral` file.
 
 ### `domain.model`
 The data definition. Fields, types, constraints, relations, immutability rules.

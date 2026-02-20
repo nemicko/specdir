@@ -1,21 +1,35 @@
 # specdir.com
 
-> The home of the Spectral Protocol — and the open directory of Spectral domain specifications.
+> The home of the Spectral Protocol — and the open directory of Spectral context specifications.
 
 ---
 
 ## What is Spectral?
 
-Spectral is an open protocol for describing application domains in a format that is both human-readable and AI-consumable.
+Spectral is an open protocol for writing down how one part of a product works, in a way both people and AI can use.
 
-A Spectral spec defines a domain across four nodes:
+A Spectral Domain is a complete application context.
+
+In Spectral, a **domain** means a bounded context of domain knowledge.
+Think of it as one business area, like `users`, `billing`, or `orders`.
+
+No-code builders made app creation easier for non-coders. Coders still need a better way to communicate concepts and context across teams, tools, and AI agents.
+Spectral fills that gap.
+
+A Spectral spec describes that context in four parts:
 
 - **Model** — data fields, types, constraints, relations
 - **Views** — how data is intended to be presented
 - **Interactions** — user actions, permissions, events
 - **Interfaces** — REST and MCP exposure contracts
 
-One spec. Any stack. Any AI agent.
+Example: a `users` domain says what a user is, how user screens should look, what actions are allowed, and which API routes exist.
+
+You define this once, then implement it in any stack.
+
+That same domain can be served through MCP with visualization intent, so consumers know both:
+- what data is coming
+- how it should be presented and interacted with
 
 → [Read the full protocol documentation](./spec/README.md)
 

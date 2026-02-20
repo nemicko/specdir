@@ -5,6 +5,7 @@ const yaml = require('js-yaml');
 const path = require('path');
 
 const REPO_URL = 'https://github.com/nemicko/specdir';
+const BRAND_ICON_DATA_URI = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22%3E%3Cstop offset=%220%25%22 stop-color=%2238bdf8%22/%3E%3Cstop offset=%22100%25%22 stop-color=%230ea5e9%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x=%224%22 y=%224%22 width=%2256%22 height=%2256%22 rx=%2216%22 fill=%22%230f172a%22/%3E%3Cpath d=%22M16 32c8-10 24-10 32 0-8 10-24 10-32 0Z%22 fill=%22url(%23g)%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%226%22 fill=%22%23f8fafc%22/%3E%3C/svg%3E';
 
 const raw = fs.readFileSync('./registry.yaml', 'utf8');
 const registry = yaml.load(raw);
@@ -35,9 +36,11 @@ const css = `
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1a1a1a; background: #fafafa; }
   header { background: #0f172a; color: #f8fafc; padding: 2rem; }
-  header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
-  header h1 span { color: #38bdf8; }
   header p { margin-top: 0.5rem; color: #94a3b8; font-size: 0.95rem; }
+  .brand { display: inline-flex; align-items: center; gap: 0.8rem; color: inherit; text-decoration: none; }
+  .brand-mark { width: 36px; height: 36px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(140deg, #38bdf8, #0ea5e9); box-shadow: 0 8px 18px rgba(14,165,233,0.35); color: #0f172a; font-size: 1rem; font-weight: 800; }
+  .brand-title { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.3px; line-height: 1.1; }
+  .brand-sub { color: #7dd3fc; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; }
   nav { display: flex; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap; }
   nav a { color: #38bdf8; text-decoration: none; font-size: 0.9rem; }
   nav a:hover { text-decoration: underline; }
@@ -63,6 +66,9 @@ const css = `
   .meta { margin-top: 2rem; color: #94a3b8; font-size: 0.82rem; text-align: center; padding-bottom: 3rem; }
   .hero { background: #fff; border-radius: 12px; padding: 2rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: 2rem; }
   .hero h2 { margin-bottom: 0.75rem; }
+  .hero-lead { font-size: 1.06rem; color: #334155; margin-bottom: 1.1rem; }
+  .hero-list { margin: 0.6rem 0 0.2rem 1.1rem; color: #334155; line-height: 1.6; }
+  .hero-list li { margin-bottom: 0.45rem; }
   .nodes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
   .node { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; }
   .node strong { display: block; color: #0f172a; margin-bottom: 0.25rem; font-size: 0.9rem; }
@@ -87,12 +93,19 @@ function layout(title, activePage, content) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title} — specdir.com</title>
+  <link rel="icon" type="image/svg+xml" href="${BRAND_ICON_DATA_URI}">
   <style>${css}</style>
 </head>
 <body>
   <header>
-    <h1><a href="/" style="color:inherit;text-decoration:none">spec<span>dir</span>.com</a></h1>
-    <p>The home of the Spectral Protocol and open directory of domain specifications.</p>
+    <a href="/" class="brand">
+      <span class="brand-mark">S</span>
+      <span>
+        <span class="brand-title">Spectral Protocol</span><br>
+        <span class="brand-sub">on specdir.com</span>
+      </span>
+    </a>
+    <p>Open protocol + package directory for AI-native domain knowledge contexts.</p>
     <nav>
       <a href="/" class="${activePage === 'home' ? 'active' : ''}">Home</a>
       <a href="/directory" class="${activePage === 'directory' ? 'active' : ''}">Directory</a>
@@ -111,8 +124,13 @@ function layout(title, activePage, content) {
 // HOME PAGE
 const homePage = layout('Home', 'home', `
   <div class="hero">
-    <h2>What is Spectral?</h2>
-    <p>Spectral is an open protocol for describing application domains in a format that is both human-readable and AI-consumable. One spec. Any stack. Any AI agent.</p>
+    <h2>One Clear Definition for Each App Module</h2>
+    <p class="hero-lead"><strong>A Spectral Domain is a complete application context.</strong> In plain words: it is one module definition (for example users, orders, or billing) that your team and AI tools can both understand.</p>
+    <ul class="hero-list">
+      <li>Step 1: define data, screens, actions, and APIs once.</li>
+      <li>Step 2: implement that module in your own stack.</li>
+      <li>Step 3: serve it via MCP so consumers know what comes in and how to visualize it.</li>
+    </ul>
     <div class="nodes">
       <div class="node"><strong>domain.model</strong><span>Fields, types, constraints, relations</span></div>
       <div class="node"><strong>domain.views</strong><span>Presentation intent for any renderer</span></div>
@@ -120,11 +138,17 @@ const homePage = layout('Home', 'home', `
       <div class="node"><strong>domain.interfaces</strong><span>REST and MCP exposure contracts</span></div>
     </div>
     <div class="actions">
-      <a href="/spec" class="btn btn-primary">Read the Protocol Spec</a>
-      <a href="/directory" class="btn btn-secondary">Browse Packages</a>
+      <a href="/spec" class="btn btn-primary">How It Works</a>
+      <a href="/packages/juice.users/" class="btn btn-secondary">See a Real Package</a>
+      <a href="/directory" class="btn btn-secondary">Browse Directory</a>
       <a href="${REPO_URL}/blob/main/CONTRIBUTING.md" class="btn btn-secondary">Publish a Package</a>
     </div>
   </div>
+
+  <h2>Why Spectral Exists</h2>
+  <p>No-code builders made app creation easier for non-coders. Coding teams still need a clean way to communicate business context across people, codebases, and AI tools.</p>
+  <p>Spectral is that missing layer: a text-first definition of an application module that includes data model, UI intent, interactions, and interfaces.</p>
+  <p>Publish it once, implement it in your own stack, or consume it through MCP with clear visualization guidance.</p>
 
   <h2>Using a Package</h2>
   <p>Reference any Spectral package by URL in your <code>.spectral</code> file:</p>
