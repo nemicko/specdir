@@ -1,25 +1,26 @@
 {
   "version": "1.0",
-  "updated": "2026-02-19T00:00:00.000Z",
+  "updated": "2026-02-19",
   "maintainers": [
     "spectral/community"
   ],
   "packages": [
     {
-      "name": "spectral-users",
-      "description": "Core user identity, authentication, roles and lifecycle management.",
-      "author": "spectral/community",
-      "domain": "spectral.dev",
-      "url": "https://spectral.dev/pkg/spectral-users",
+      "name": "juice.users",
+      "description": "User identity, authentication, roles and lifecycle management.",
+      "author": "juice",
+      "domain": "specdir.com",
+      "url": "https://raw.githubusercontent.com/spectral-protocol/specdir/main/packages/juice.users/index.spectral",
       "tags": [
         "identity",
         "auth",
+        "admin",
         "core"
       ],
       "maturity": "draft",
-      "submitted": "2026-02-19T00:00:00.000Z"
+      "submitted": "2026-02-20"
     }
   ],
-  "generated": "2026-02-19T22:03:49.979Z",
+  "generated": "2026-02-20T10:00:17.920Z",
   "count": 1
 }
