@@ -1,0 +1,110 @@
+spectral: "1.0"
+node: users.interactions
+description: "User-facing actions and system behaviors within the users domain."
+author: juice
+dependencies:
+  - "@users.model"
+  - "@users.views"
+
+interactions:
+  create:
+    description: "Register a new user."
+    trigger: form-submit
+    view: "@users.views.form.create"
+    input:
+      - "@users.model.email"
+      - "@users.model.displayName"
+      - "@users.model.username"
+      - "@users.model.role"
+      - "@users.model.locale"
+    outcome:
+      success:
+        - set status: pending
+        - emit: user.created
+        - navigate: "@users.views.detail"
+      failure:
+        - display: inline-errors
+
+  invite:
+    description: "Admin invites a user by email. Account is created in pending state awaiting acceptance."
+    trigger: action
+    restricted: [admin]
+    input:
+      - "@users.model.email"
+      - "@users.model.role"
+    outcome:
+      success:
+        - set status: pending
+        - emit: user.invited
+      failure:
+        - display: inline-errors
+
+  suspend:
+    description: "Suspend a user. Revokes access immediately."
+    trigger: action
+    restricted: [admin]
+    requires:
+      - "@users.model.status == active"
+    confirmation: true
+    outcome:
+      success:
+        - set status: suspended
+        - emit: user.suspended
+
+  reactivate:
+    description: "Restore a suspended user to active status."
+    trigger: action
+    restricted: [admin]
+    requires:
+      - "@users.model.status == suspended"
+    outcome:
+      success:
+        - set status: active
+        - emit: user.reactivated
+
+  delete:
+    description: "Soft delete. User record is retained but made inaccessible."
+    trigger: action
+    restricted: [admin]
+    confirmation: true
+    confirmation_text: "This action cannot be undone."
+    outcome:
+      success:
+        - set status: deleted
+        - emit: user.deleted
+
+  edit:
+    description: "Edit mutable user fields."
+    trigger: form-submit
+    view: "@users.views.form.edit"
+    restricted:
+      - admin: any user
+      - member: self only
+    input:
+      - "@users.model.displayName"
+      - "@users.model.username"
+      - "@users.model.avatarUrl"
+      - "@users.model.locale"
+    outcome:
+      success:
+        - emit: user.updated
+        - navigate: "@users.views.detail"
+
+  change_role:
+    description: "Modify a user's primary role."
+    trigger: action
+    restricted: [admin]
+    input:
+      - "@users.model.role"
+    outcome:
+      success:
+        - emit: user.role_changed
+
+events:
+  - user.created
+  - user.invited
+  - user.suspended
+  - user.reactivated
+  - user.deleted
+  - user.updated
+  - user.role_changed

@@ -10,7 +10,7 @@
       "description": "User identity, authentication, roles and lifecycle management.",
       "author": "juice",
       "domain": "specdir.com",
-      "url": "https://raw.githubusercontent.com/spectral-protocol/specdir/main/packages/juice.users/index.spectral",
+      "url": "https://specdir.com/packages/juice.users/index.spectral",
       "tags": [
         "identity",
         "auth",
@@ -21,6 +21,6 @@
       "submitted": "2026-02-20"
     }
   ],
-  "generated": "2026-02-20T12:47:20.254Z",
+  "generated": "2026-02-20T13:00:30.628Z",
   "count": 1
 }

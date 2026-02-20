@@ -8,7 +8,7 @@ packages:
     description: "User identity, authentication, roles and lifecycle management."
     author: juice
     domain: specdir.com
-    url: https://raw.githubusercontent.com/spectral-protocol/specdir/main/packages/juice.users/index.spectral
+    url: https://specdir.com/packages/juice.users/index.spectral
     tags: [identity, auth, admin, core]
     maturity: draft
     submitted: "2026-02-20"
