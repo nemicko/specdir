@@ -1,0 +1,48 @@
+:::ACS_METADATA
+DOMAIN: juice.users
+CONTEXT: Flow
+VERSION: 1.2.0
+:::
+
+FLOW PrepareNewUser {
+  TRIGGER: Contract.RegisterUser | Contract.InviteUser
+  STEPS:
+    1. Normalize email and username.
+    2. Enforce Schema.User uniqueness constraints.
+    3. Set status=pending when identity verification is incomplete.
+    4. Stamp createdAt/updatedAt.
+}
+
+FLOW ActivateVerifiedUser {
+  TRIGGER: Internal.IdentityVerified
+  REQUIRES:
+    - Schema.User.status == pending
+  STEPS:
+    1. Set status=active.
+    2. Stamp updatedAt.
+    3. Emit DomainEvent user.activated.
+}
+
+FLOW SuspendAccess {
+  TRIGGER: Contract.SuspendUser
+  REQUIRES:
+    - Schema.User.status == active
+  STEPS:
+    1. Set status=suspended.
+    2. Revoke active sessions.
+    3. Emit DomainEvent user.suspended.
+}
+
+FLOW SoftDeleteUser {
+  TRIGGER: Contract.DeleteUser
+  STEPS:
+    1. Set status=deleted.
+    2. Invalidate auth sessions.
+    3. Emit DomainEvent user.deleted.
+}
+
+FLOW TouchUpdatedAt {
+  TRIGGER: Schema.User.updated
+  STEPS:
+    1. Set updatedAt=now.
+}

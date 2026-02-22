@@ -1,14 +1,14 @@
-version: "1.0"
-updated: "2026-02-19"
+version: "1.2"
+updated: "2026-02-22"
 maintainers:
-  - spectral/community
+  - acs/community
 
-packages:
+features:
   - name: juice.users
     description: "User identity, authentication, roles and lifecycle management."
     author: juice
     domain: specdir.com
-    url: https://specdir.com/packages/juice.users/index.spectral
+    url: https://specdir.com/features/juice.users/users.contract.acs
     tags: [identity, auth, admin, core]
     maturity: draft
-    submitted: "2026-02-20"
+    submitted: "2026-02-22"
