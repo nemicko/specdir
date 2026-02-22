@@ -28,5 +28,5 @@ jobs:
       - name: Check URLs are reachable
         run: node .github/scripts/check-urls.js
 
-      - name: Validate Spectral format
-        run: node .github/scripts/validate-spectral.js
+      - name: Validate ACS format
+        run: node .github/scripts/validate-acs.js

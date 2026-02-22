@@ -1,160 +1,128 @@
-# The Spectral Protocol
+# Application Context Script (ACS) v1.2
 
-Spectral is an open protocol for describing one business context of an app in a format both people and AI can understand.
+ACS is a declarative, language-agnostic protocol for software requirements. It shifts development from imperative coding (how) to feature definition (what).
 
-## Core Idea
+An ACS Feature defines a complete slice of your product — what it is, how it behaves, and how it's experienced.
+Write it once. Build it anywhere.
 
-A Spectral Domain is a complete application context.
+## 1. Structural Unit: Feature
 
-A Spectral spec describes **what a context is** — not which framework you use.
-In Spectral, "domain" means a bounded context of domain knowledge (for example: users, billing, orders).
+The primary unit is a **Feature** (bounded context), named:
 
-No-code tools help non-coders build fast, but coding teams still need shared context they can move across stacks and tools.
-Spectral gives that shared context a portable format.
+- `company.subsystem` (example: `xyz.users`)
 
-Think of it like this:
-- Your code is the building.
-- Spectral is the blueprint.
+Physical layout:
 
-The same spec can drive an Angular frontend, a Node.js backend, a REST API, or a GraphQL schema. It can also travel with data at runtime via MCP, so AI agents know what data is arriving and how to display and interact with it correctly.
-
-Code is generated output. The spec is the truth.
-
----
-
-## Node Types
-
-Every Spectral domain context is described across four node types. Each node is a separate `.spectral` file.
-
-### `domain.model`
-The data definition. Fields, types, constraints, relations, immutability rules.
-
-### `domain.views`
-Presentation intent. Table columns, detail layouts, form variants, card definitions. Describes *how* data should be presented — not in which framework.
-
-### `domain.interactions`
-Behavior. User-triggered and system-triggered actions, their preconditions, permission requirements, outcomes, and emitted events.
-
-### `domain.interfaces`
-Boundaries. How the domain exposes data (REST, MCP) and what it consumes from other domains.
-
----
-
-## File Structure
-
-```
-my-domain/
-  index.spectral          ← package entry point and metadata
-  model.spectral
-  views.spectral
-  interactions.spectral
-  interfaces.spectral
+```text
+/features/[feature.name]/
+  ├── [feature].schema.acs
+  ├── [feature].flow.acs
+  ├── [feature].contract.acs
+  └── [feature].persona.acs
 ```
 
----
+## 2. The Four Contexts
 
-## Node Anatomy
+### Schema (Data Context)
 
-Every `.spectral` file shares the same mandatory header:
+Defines static ground truth:
+- entities
+- attributes
+- data types
+- relationships
 
-```yaml
-spectral: "1.0"           # protocol version
-node: users.model         # dot-notation address
-description: "..."        # human readable, max 120 chars
-author: your-name
-dependencies:             # other nodes this file references
-  - "@users.model"
-  - https://specdir.com/packages/acme.billing/...
+### Flow (Mechanism Context)
+
+Defines internal engine behavior:
+- private procedures
+- background tasks
+- auto-triggers
+- internal state changes
+
+### Contract (Business Logic + Interface Context)
+
+Defines exchange layer:
+- public business rules
+- machine interfaces
+
+### Persona (View + Experience Context)
+
+Defines human interface:
+- user-specific views
+- intent-driven UI requirements
+- frontend interaction logic
+
+## 3. Required Metadata Header
+
+Every `.acs` file starts with:
+
+```acs
+:::ACS_METADATA
+DOMAIN: [namespace.name]
+CONTEXT: [Schema | Flow | Contract | Persona]
+VERSION: [SemVer]
+IMPORT: [Optional list of external Contracts or Schemas]
+:::
 ```
 
----
+## 4. Cross-Feature Reference Rules
 
-## Reference Syntax
+1. **Encapsulation:** A feature may not access another feature's Schema or Flow.
+2. **Exchange:** Inter-feature communication happens through Contracts.
+3. **Import syntax:**
 
-References to other nodes use `@` prefix:
-
-```yaml
-# Reference a specific field
-@users.model.id
-
-# Reference an entire node
-@users.model
-
-# Reference a nested view variant
-@users.views.form.create
-
-# Reference a registry package (external)
-https://specdir.com/packages/acme.billing/index.spectral
+```acs
+IMPORT other.feature.Contract AS Alias
 ```
 
----
+## 5. AI Handshake (Execution Priority)
 
-## Type System
+1. **Context Mapping:** parse all `.acs` files and build dependency graph.
+2. **Environment Detection:** infer target language/framework/database.
+3. **Synthesis:**
+   - new project: generate from scratch
+   - legacy project: generate adapter layers to map ACS to existing code/data
+4. **Consistency Check:**
+   - every Persona action maps to a Contract
+   - every Contract is backed by Flow or Schema behavior
 
-### Primitive types
-`string` `number` `boolean` `date` `datetime`
+## 6. Rule of Thumb
 
-### Semantic types
-`email` `uuid` `url` `currency` `phone` `locale` `richtext` `markdown`
+Every user-visible action maps to a Contract, and every Contract maps to at least one Flow or Schema effect.
 
-### Composite types
-`enum` — requires a `values` list
-`array` — requires an `items` type
-`object` — requires a `fields` block
+## 7. Example (`xyz.billing`)
 
----
+```acs
+:::ACS_METADATA
+DOMAIN: xyz.billing
+CONTEXT: Contract
+VERSION: 1.0.0
+IMPORT:
+  - xyz.users.Contract AS Users
+:::
 
-## Field Modifiers
+CONTRACT FinalizeInvoice {
+  LOGIC: |
+    1. CALL Users.VerifyIdentity(user_id)
+    2. IF valid, EXECUTE Flow.CalculateTotal
+    3. PERSIST Schema.Invoice
 
-```yaml
-required: true | false
-unique: true | false
-immutable: true | false
-generated: true           # system-assigned, not user-provided
-default: value
-min: number               # string length or numeric minimum
-max: number               # string length or numeric maximum
-pattern: "regex"          # string validation pattern
+  INTERFACE:
+    - REST: POST /billing/finalize
+}
 ```
 
----
+```acs
+:::ACS_METADATA
+DOMAIN: xyz.billing
+CONTEXT: Persona
+VERSION: 1.0.0
+:::
 
-## Maturity Levels
-
-| Level | Meaning |
-|---|---|
-| `draft` | Work in progress. Breaking changes expected. |
-| `beta` | Stable enough for experimentation. |
-| `stable` | Production ready. Breaking changes only on major version bump. |
-| `deprecated` | Superseded. Include `replacement` URL. |
-
----
-
-## MCP Runtime
-
-A domain that declares an `interfaces.mcp` block exposes its Spectral spec nodes alongside its data at runtime. A consuming AI agent receives:
-
-1. The data
-2. The `model` node — field semantics and types
-3. The `views` node — intended presentation contract
-4. The `interactions` node — available actions and permissions
-
-This allows the agent to render and interact with the domain correctly without additional configuration. The spec *is* the integration contract.
-
----
-
-## Versioning
-
-Spectral packages use semantic versioning. The version is declared in `index.spectral`:
-
-```yaml
-version: 1.2.0
+PERSONA Customer {
+  VIEW Receipt {
+    DISPLAY: Schema.Invoice(amount, date)
+    ACTION: "Print" -> System.LocalPrint
+  }
+}
 ```
-
-Consumers pin versions in dependency URLs:
-
-```
-https://raw.githubusercontent.com/.../index.spectral@1.2.0
-```
-
-Breaking changes (field removal, type changes, node restructuring) require a major version bump.

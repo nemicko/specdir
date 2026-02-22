@@ -1,89 +1,91 @@
 # specdir.com
 
-> The home of the Spectral Protocol — and the open directory of Spectral context specifications.
+> The home of the Application Context Script (ACS) — and the open directory of ACS Features.
 
 ---
 
-## What is Spectral?
+The way we build software has always evolved through abstraction leaps. Assembly to code. Code to frameworks. Frameworks to AI.
 
-Spectral is an open protocol for writing down how one part of a product works, in a way both people and AI can use.
+But AI needs something frameworks never had — a clear definition of what a product actually is.
 
-A Spectral Domain is a complete application context.
+ACS is that definition layer. Above code. Above frameworks. Above stack choices.
 
-In Spectral, a **domain** means a bounded context of domain knowledge.
-Think of it as one business area, like `users`, `billing`, or `orders`.
-
-No-code builders made app creation easier for non-coders. Coders still need a better way to communicate concepts and context across teams, tools, and AI agents.
-Spectral fills that gap.
-
-A Spectral spec describes that context in four parts:
-
-- **Model** — data fields, types, constraints, relations
-- **Views** — how data is intended to be presented
-- **Interactions** — user actions, permissions, events
-- **Interfaces** — REST and MCP exposure contracts
-
-Example: a `users` domain says what a user is, how user screens should look, what actions are allowed, and which API routes exist.
-
-You define this once, then implement it in any stack.
-
-That same domain can be served through MCP with visualization intent, so consumers know both:
-- what data is coming
-- how it should be presented and interacted with
-
-→ [Read the full protocol documentation](./spec/README.md)
+Define what your product is. Let AI handle how it's built.
 
 ---
 
-## Package Directory
+## What is ACS?
 
-| Package | Description | Author | Maturity |
+ACS is an open standard for defining complete product features in a format both humans and AI can execute.
+
+An ACS Feature defines a complete slice of your product — what it is, how it behaves, and how it's experienced.
+Write it once. Build it anywhere.
+
+An ACS Feature describes that slice in four files:
+
+- **Schema** — entities, attributes, types, and relationships
+- **Flow** — internal mechanisms, triggers, background tasks, and private state changes
+- **Contract** — public business rules and machine interfaces (REST, GraphQL, gRPC, MCP bridge)
+- **Persona** — user-facing views, intent, and UI actions mapped to contracts
+
+-> [Read the full ACS specification](./spec/README.md)
+
+---
+
+## Feature Directory
+
+| Feature | Description | Author | Maturity |
 |---|---|---|---|
-| [juice.users](./packages/juice.users) | User identity, authentication, roles and lifecycle management. | juice | draft |
+| [juice.users](./features/juice.users) | User identity, authentication, roles and lifecycle management. | juice | draft |
 
-→ [Browse all packages](https://specdir.com/directory)
+-> [Browse all features](https://specdir.com/directory)
 
 ---
 
-## Using a Package
+## Using a Feature
 
-In any `.spectral` file, reference a package by its URL:
+In any `.acs` file, import a Feature Contract:
 
-```yaml
-dependencies:
-  - https://specdir.com/packages/juice.users/index.spectral
+```acs
+:::ACS_METADATA
+FEATURE: acme.billing
+CONTEXT: Contract
+VERSION: 1.2.0
+IMPORT:
+  - juice.users.Contract AS Users
+:::
 ```
 
 Tell your AI agent to integrate it:
 
-> "Integrate the juice.users package from the dependency URL into this application."
+> "Integrate the `juice.users` ACS Feature into this application and preserve ACS boundaries."
 
-The agent fetches the spec, reads the nodes, understands the domain, and implements it against your stack.
+The agent parses the feature graph and generates or adapts implementation against your stack.
 
 ---
 
 ## Implementing with AI
 
-Every package page on specdir.com includes a ready-to-use AI prompt.
+Every feature page on specdir.com includes a ready-to-use AI prompt.
 Copy it into any AI coding tool (Claude Code, Codex, Cursor) to generate a full implementation:
 
-> [Implement juice.users](https://specdir.com/packages/juice.users/)
+> [Implement juice.users](https://specdir.com/features/juice.users/)
 
-Or use the universal template from [prompts/implement.md](./prompts/implement.md) — replace `{{PACKAGE_URL}}` with your package URL.
+Or use the universal template from [prompts/implement.md](./prompts/implement.md).
 
 ---
 
-## Publishing a Package
+## Publishing a Feature
 
-Anyone can list a Spectral package in this directory.
+Anyone can list an ACS Feature in this directory.
 
 **Requirements:**
-1. Your spec must live at a stable public URL on your own domain
-2. It must be valid Spectral format
-3. The `domain` field must match the URL domain
+1. Your feature files must live at stable public URLs on your own domain
+2. Files must include valid ACS metadata headers
+3. The `feature` field in the registry must match your URL hostname
 
-→ [Read the contribution guide](./CONTRIBUTING.md)
-→ [Submit via Pull Request](https://github.com/nemicko/specdir/pulls)
+-> [Read the contribution guide](./CONTRIBUTING.md)
+-> [Submit via Pull Request](https://github.com/nemicko/specdir/pulls)
 
 ---
 
@@ -101,11 +103,3 @@ GET https://specdir.com/registry.json
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](./LICENSE).
-
----
-
-## Community
-
-- **Issues** — bug reports and questions
-- **Discussions** — protocol evolution and ideas
-- **Pull Requests** — new packages and updates

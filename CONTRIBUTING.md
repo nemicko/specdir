@@ -1,74 +1,57 @@
 # Contributing to specdir
 
-## Submitting a New Package
+## Submitting a New ACS Feature
 
 1. **Fork this repository**
 
 2. **Add your entry to `registry.yaml`**
 
    ```yaml
-   - name: publisher.packagename
-     description: "One sentence describing what domain this covers."
+   - name: publisher.feature
+     description: "One sentence describing what product slice this covers."
      author: Your Name or Org
      domain: yourdomain.com
-     url: https://yourdomain.com/path/to/your/spectral/package
+     url: https://yourdomain.com/features/publisher.feature/feature.contract.acs
      tags: [tag1, tag2]
      maturity: draft | beta | stable
      submitted: YYYY-MM-DD
    ```
 
 3. **Requirements before submitting:**
-   - Your URL must be publicly reachable
-   - Your spec must be valid Spectral format (CI will validate automatically)
-   - The `domain` field must match the domain in your `url`
-   - Package name must be unique in the registry
-   - Package name must follow the pattern: `publisher.domain` (lowercase alphanumeric, dot separator)
+   - URL must be publicly reachable
+   - URL must return a valid ACS file with `:::ACS_METADATA`
+   - `domain` field must match the URL hostname
+   - Feature name must be unique in the registry
+   - Feature name must match: `publisher.feature` (lowercase alphanumeric with dot separator)
 
 4. **Open a Pull Request**
-   - Title: `Add: publisher.yourpackage`
-   - Include a brief description of what domain the spec covers
-   - CI will automatically validate your spec URL and format
-
-5. **Review and merge**
-   - A maintainer will review within 7 days
-   - Feedback will be given via PR comments
-   - Once approved, your package is live immediately on merge
+   - Title: `Add: publisher.feature`
+   - Include a short feature summary
+   - CI validates registry fields, URL reachability, and ACS metadata format
 
 ---
 
-## Updating an Existing Package
+## Updating an Existing Feature
 
-Open a PR with the change to your entry in `registry.yaml`.
-
-- URL changes, description updates, maturity bumps — all handled via PR
-- You must be the original submitter or provide proof of ownership
-- Breaking URL changes require a comment explaining migration path
+Open a PR with updates to the existing entry in `registry.yaml`.
 
 ---
 
-## Removing a Package
+## Removing a Feature
 
-Open an issue with title `Remove: publisher.yourpackage` and reason.
+Open an issue titled `Remove: publisher.feature` with reason.
 
-Packages are not hard-deleted — they are marked `deprecated` with a forwarding URL where possible, preserving history.
+Features are not hard-deleted. They should be marked `deprecated` and include `replacement` where possible.
 
 ---
 
-## Validation Rules (enforced by CI)
+## Validation Rules (CI)
 
-- `name` — required, unique, matches `publisher.domain` (lowercase alphanumeric, dot separator)
-- `description` — required, max 120 characters
+- `name` — required, unique, matches `publisher.feature`
+- `description` — required, max 120 chars
 - `author` — required
-- `domain` — required, must match URL domain
-- `url` — required, must be reachable, must return valid Spectral format
-- `tags` — required, at least one
-- `maturity` — required, one of: draft, beta, stable, deprecated
-- `submitted` — required, ISO date format
-
----
-
-## Code of Conduct
-
-This directory is infrastructure. Keep PRs and issues focused on the registry.
-Protocol discussions belong in [Discussions](../../discussions).
-Be respectful. Maintainers have final say on listings.
+- `domain` — required, must match URL hostname
+- `url` — required, reachable, and must return valid ACS metadata
+- `tags` — required non-empty array
+- `maturity` — one of: draft, beta, stable, deprecated
+- `submitted` — required ISO date (`YYYY-MM-DD`)

@@ -1,13 +1,13 @@
-name: Submit Package
-description: Request to list a new Spectral package in specdir
+name: Submit Feature
+description: Request to list a new ACS Feature in specdir
 title: "Add: "
-labels: ["new-package"]
+labels: ["new-feature"]
 
 body:
   - type: input
-    id: package-name
+    id: feature_name
     attributes:
-      label: Package name
+      label: Feature name
       placeholder: stripe.payments
     validations:
       required: true
@@ -15,9 +15,9 @@ body:
   - type: input
     id: url
     attributes:
-      label: Spec URL
-      description: The stable public URL where your Spectral package lives
-      placeholder: https://yourdomain.com/spectral/payments
+      label: Feature Contract URL
+      description: Stable public URL to your Feature Contract `.acs` file
+      placeholder: https://yourdomain.com/features/stripe.payments/payments.contract.acs
     validations:
       required: true
 
@@ -25,7 +25,7 @@ body:
     id: description
     attributes:
       label: Description
-      description: One sentence describing what domain this spec covers (max 120 chars)
+      description: One sentence describing what product slice this feature covers (max 120 chars)
     validations:
       required: true
 
@@ -47,7 +47,7 @@ body:
       options:
         - label: My URL is publicly reachable
           required: true
-        - label: My spec is valid Spectral format
+        - label: My file includes a valid `:::ACS_METADATA` block
           required: true
         - label: My domain in the entry matches the URL domain
           required: true

@@ -12,7 +12,10 @@ function fetchHead(url) {
       resolve({ ok: res.statusCode >= 200 && res.statusCode < 400, status: res.statusCode });
     });
     req.on('error', (err) => resolve({ ok: false, status: err.message }));
-    req.on('timeout', () => { req.destroy(); resolve({ ok: false, status: 'timeout' }); });
+    req.on('timeout', () => {
+      req.destroy();
+      resolve({ ok: false, status: 'timeout' });
+    });
     req.end();
   });
 }
@@ -20,24 +23,24 @@ function fetchHead(url) {
 async function main() {
   const raw = fs.readFileSync('./registry.yaml', 'utf8');
   const registry = yaml.load(raw);
-  const packages = registry.packages || [];
+  const features = registry.features || [];
 
-  console.log(`Checking ${packages.length} URL(s)...\n`);
+  console.log(`Checking ${features.length} URL(s)...\n`);
 
   let failed = 0;
 
-  for (const pkg of packages) {
-    if (!pkg.url) {
-      console.log(`  SKIP [${pkg.name}] no URL`);
+  for (const feature of features) {
+    if (!feature.url) {
+      console.log(`  SKIP [${feature.name}] no URL`);
       continue;
     }
 
-    const result = await fetchHead(pkg.url);
+    const result = await fetchHead(feature.url);
 
     if (result.ok) {
-      console.log(`  OK   [${pkg.name}] ${pkg.url} (${result.status})`);
+      console.log(`  OK   [${feature.name}] ${feature.url} (${result.status})`);
     } else {
-      console.log(`  FAIL [${pkg.name}] ${pkg.url} (${result.status})`);
+      console.log(`  FAIL [${feature.name}] ${feature.url} (${result.status})`);
       failed++;
     }
   }
@@ -49,7 +52,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`All URLs reachable`);
+  console.log('All URLs reachable');
 }
 
 main();

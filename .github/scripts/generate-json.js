@@ -7,12 +7,13 @@ const yaml = require('js-yaml');
 
 const raw = fs.readFileSync('./registry.yaml', 'utf8');
 const registry = yaml.load(raw);
+const features = registry.features || [];
 
 registry.generated = new Date().toISOString();
-registry.count = registry.packages ? registry.packages.length : 0;
+registry.count = features.length;
 
 fs.mkdirSync('./dist', { recursive: true });
 fs.writeFileSync('./dist/registry.json', JSON.stringify(registry, null, 2));
 fs.copyFileSync('./registry.yaml', './dist/registry.yaml');
 
-console.log(`Generated registry.json with ${registry.count} package(s)`);
+console.log(`Generated registry.json with ${registry.count} feature(s)`);

@@ -1,0 +1,46 @@
+:::ACS_METADATA
+DOMAIN: juice.users
+CONTEXT: Persona
+VERSION: 1.2.0
+:::
+
+PERSONA Admin {
+  VIEW Directory {
+    DISPLAY:
+      - avatarUrl as avatar
+      - displayName as primary sortable
+      - email sortable
+      - role as badge filterable
+      - status as badge filterable
+      - createdAt as relative-date sortable
+    ACTIONS:
+      - "Open User" -> Contract.UsersAPI(detail)
+      - "Suspend" -> Contract.SuspendUser
+      - "Reactivate" -> Contract.ReactivateUser
+      - "Delete" -> Contract.DeleteUser
+  }
+
+  VIEW UserEditor {
+    DISPLAY:
+      - form.create: [email, displayName, username, role, locale]
+      - form.edit: [displayName, username, avatarUrl, locale]
+    ACTIONS:
+      - "Create User" -> Contract.RegisterUser
+      - "Invite User" -> Contract.InviteUser
+      - "Save Changes" -> Contract.EditUser
+      - "Change Role" -> Contract.ChangeUserRole
+  }
+}
+
+PERSONA Member {
+  VIEW SelfProfile {
+    DISPLAY:
+      - avatarUrl
+      - displayName
+      - email
+      - locale
+      - updatedAt
+    ACTIONS:
+      - "Edit Profile" -> Contract.EditUser
+  }
+}

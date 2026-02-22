@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Protocol Spec — specdir.com</title>
+  <title>juice.users — specdir.com</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22%3E%3Cstop offset=%220%25%22 stop-color=%2206b6d4%22/%3E%3Cstop offset=%22100%25%22 stop-color=%2214b8a6%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x=%224%22 y=%224%22 width=%2256%22 height=%2256%22 rx=%2216%22 fill=%22%230b1f2a%22/%3E%3Cpath d=%22M16 32c8-10 24-10 32 0-8 10-24 10-32 0Z%22 fill=%22url(%23g)%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%226%22 fill=%22%23ccfbf1%22/%3E%3C/svg%3E">
   <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -61,7 +61,7 @@
 </head>
 <body>
   <header>
-    <a href="../index.html" class="brand">
+    <a href="../../index.html" class="brand">
       <span class="brand-mark">C</span>
       <span>
         <span class="brand-title">Application Context Script</span><br>
@@ -70,142 +70,138 @@
     </a>
     <p>Open protocol + directory for AI-native Features.</p>
     <nav>
-      <a href="../index.html" class="">Home</a>
-      <a href="../directory/index.html" class="">Directory</a>
-      <a href="../spec/index.html" class="active">Protocol Spec</a>
+      <a href="../../index.html" class="">Home</a>
+      <a href="../../directory/index.html" class="active">Directory</a>
+      <a href="../../spec/index.html" class="">Protocol Spec</a>
       <a href="https://github.com/nemicko/specdir">GitHub</a>
-      <a href="../registry.json">registry.json</a>
+      <a href="../../registry.json">registry.json</a>
     </nav>
   </header>
   <main>
     
-  <div style="background:#fff;border-radius:12px;padding:2rem;box-shadow:0 1px 4px rgba(0,0,0,0.07)">
-    <h2>Application Context Script (ACS) v1.2</h2>
+    <div class="feature-header">
+      <h2>juice.users</h2>
+      <p>User identity, authentication, roles and lifecycle management.</p>
+      <div class="feature-meta">
+        <span>by <strong>juice</strong></span>
+        <span class="badge" style="background:#6b7280;color:#fff">draft</span>
+        <span class="tag">identity</span> <span class="tag">auth</span> <span class="tag">admin</span> <span class="tag">core</span>
+      </div>
+    </div>
 
-<p>ACS is a declarative, language-agnostic protocol for software requirements. It shifts development from imperative coding (how) to feature definition (what).</p>
+    <h2>Context Files</h2>
+    <table>
+      <thead><tr><th>File</th></tr></thead>
+      <tbody>
+        <tr><td><a href="./users.schema.acs" target="_blank">users.schema.acs</a></td></tr><tr><td><a href="./users.flow.acs" target="_blank">users.flow.acs</a></td></tr><tr><td><a href="./users.contract.acs" target="_blank">users.contract.acs</a></td></tr><tr><td><a href="./users.persona.acs" target="_blank">users.persona.acs</a></td></tr>
+      </tbody>
+    </table>
 
-<p>An ACS Feature defines a complete slice of your product — what it is, how it behaves, and how it's experienced.</p>
-<p>Write it once. Build it anywhere.</p>
+    <h2>Usage</h2>
+    <p>Import this Feature Contract from another <code>.acs</code> Contract file:</p>
+    <pre><code>:::ACS_METADATA
+DOMAIN: acme.billing
+CONTEXT: Contract
+VERSION: 1.2.0
+IMPORT:
+  - juice.users.Contract AS Users
+:::</code></pre>
 
-<h2>1. Structural Unit: Feature</h2>
+    
+    <h2>Implement with AI</h2>
+    <p>Copy this prompt into your AI coding tool to implement this Feature.</p>
+    <div class="prompt-wrap">
+      <button class="copy-btn" onclick="copyPrompt()">Copy</button>
+      <pre id="prompt-text"><code># Implement an ACS Feature
 
-<p>The primary unit is a <strong>Feature</strong> (bounded context), named:</p>
+You are implementing an Application Context Script (ACS) Feature as either a new application module or a component integrated into an existing codebase.
 
-<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">company.subsystem</code> (example: <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">xyz.users</code>)</p>
+An ACS Feature defines a complete slice of the product: what it is, how it behaves, and how it's experienced.
 
-<p>Physical layout:</p>
+## Step 1: Read the Protocol
 
-<pre><code>/features/[feature.name]/
-<p>  ├── [feature].schema.acs</p>
-<p>  ├── [feature].flow.acs</p>
-<p>  ├── [feature].contract.acs</p>
-<p>  └── [feature].persona.acs</p>
-<p></code></pre></p>
+Read the protocol spec:
 
-<h2>2. The Four Contexts</h2>
+```
+https://specdir.com/spec
+```
 
-<h3>Schema (Data Context)</h3>
+## Step 2: Fetch Feature Files
 
-<p>Defines static ground truth:</p>
-<p>- entities</p>
-<p>- attributes</p>
-<p>- data types</p>
-<p>- relationships</p>
+Fetch the target feature folder and read all four files completely:
 
-<h3>Flow (Mechanism Context)</h3>
+- `[feature].schema.acs`
+- `[feature].flow.acs`
+- `[feature].contract.acs`
+- `[feature].persona.acs`
 
-<p>Defines internal engine behavior:</p>
-<p>- private procedures</p>
-<p>- background tasks</p>
-<p>- auto-triggers</p>
-<p>- internal state changes</p>
+Do not generate code until all four files are parsed.
 
-<h3>Contract (Business Logic + Interface Context)</h3>
+## Step 3: Confirm Host Stack
 
-<p>Defines exchange layer:</p>
-<p>- public business rules</p>
-<p>- machine interfaces</p>
+Ask the user for:
 
-<h3>Persona (View + Experience Context)</h3>
+1. Language
+2. Backend framework
+3. Frontend framework
+4. ORM/database layer
+5. UI component library/design system
 
-<p>Defines human interface:</p>
-<p>- user-specific views</p>
-<p>- intent-driven UI requirements</p>
-<p>- frontend interaction logic</p>
+## Step 4: Generate by Context
 
-<h2>3. Required Metadata Header</h2>
+### Schema -&gt; Data Layer
 
-<p>Every <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">.acs</code> file starts with:</p>
+Generate model/entity types, DB schema/migrations, validation constraints, and relations.
 
-<pre><code>:::ACS_METADATA
-<p>DOMAIN: [namespace.name]</p>
-<p>CONTEXT: [Schema | Flow | Contract | Persona]</p>
-<p>VERSION: [SemVer]</p>
-<p>IMPORT: [Optional list of external Contracts or Schemas]</p>
-<p>:::</p>
-<p></code></pre></p>
+### Flow -&gt; Internal Mechanisms
 
-<h2>4. Cross-Feature Reference Rules</h2>
+Generate private services/jobs, event listeners, and internal state transitions.
 
-<p>1. <strong>Encapsulation:</strong> A feature may not access another feature's Schema or Flow.</p>
-<p>2. <strong>Exchange:</strong> Inter-feature communication happens through Contracts.</p>
-<p>3. <strong>Import syntax:</strong></p>
+### Contract -&gt; Public Exchange Layer
 
-<pre><code>IMPORT other.feature.Contract AS Alias
-<p></code></pre></p>
+Generate API routes/controllers, guards, I/O contracts, and external adapters.
 
-<h2>5. AI Handshake (Execution Priority)</h2>
+### Persona -&gt; UX Layer
 
-<p>1. <strong>Context Mapping:</strong> parse all <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">.acs</code> files and build dependency graph.</p>
-<p>2. <strong>Environment Detection:</strong> infer target language/framework/database.</p>
-<p>3. <strong>Synthesis:</strong></p>
-<p>   - new project: generate from scratch</p>
-<p>   - legacy project: generate adapter layers to map ACS to existing code/data</p>
-<p>4. <strong>Consistency Check:</strong></p>
-<p>   - every Persona action maps to a Contract</p>
-<p>   - every Contract is backed by Flow or Schema behavior</p>
+Generate screens/components, view models/layout contracts, and UI action bindings to Contract capabilities.
 
-<h2>6. Rule of Thumb</h2>
+## Required Enforcement
 
-<p>Every user-visible action maps to a Contract, and every Contract maps to at least one Flow or Schema effect.</p>
+1. Persona actions cannot bypass Contracts.
+2. Contracts cannot exist without Flow or Schema backing.
+3. Cross-feature calls must go through imported Contracts.
+4. Respect `DOMAIN`, `CONTEXT`, `VERSION`, and `IMPORT` metadata.
 
-<h2>7. Example (<code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">xyz.billing</code>)</h2>
+## Legacy Codebase Mode
 
-<pre><code>:::ACS_METADATA
-<p>DOMAIN: xyz.billing</p>
-<p>CONTEXT: Contract</p>
-<p>VERSION: 1.0.0</p>
-<p>IMPORT:</p>
-<p>  - xyz.users.Contract AS Users</p>
-<p>:::</p>
+If integrating into an existing project:
 
-<p>CONTRACT FinalizeInvoice {</p>
-<p>  LOGIC: |</p>
-<p>    1. CALL Users.VerifyIdentity(user_id)</p>
-<p>    2. IF valid, EXECUTE Flow.CalculateTotal</p>
-<p>    3. PERSIST Schema.Invoice</p>
+1. Keep existing architecture conventions.
+2. Generate adapter layers from ACS Contracts/Personas to existing code paths.
+3. Avoid broad rewrites unless requested.
 
-<p>  INTERFACE:</p>
-<p>    - REST: POST /billing/finalize</p>
-<p>}</p>
-<p></code></pre></p>
+## If URL Fetch Is Unavailable
 
-<pre><code>:::ACS_METADATA
-<p>DOMAIN: xyz.billing</p>
-<p>CONTEXT: Persona</p>
-<p>VERSION: 1.0.0</p>
-<p>:::</p>
-
-<p>PERSONA Customer {</p>
-<p>  VIEW Receipt {</p>
-<p>    DISPLAY: Schema.Invoice(amount, date)</p>
-<p>    ACTION: "Print" -> System.LocalPrint</p>
-<p>  }</p>
-<p>}</p>
-<p></code></pre></p>
-
-  </div>
-
+Ask the user to paste:
+1. Protocol spec (`spec/README.md`)
+2. `[feature].schema.acs`
+3. `[feature].flow.acs`
+4. `[feature].contract.acs`
+5. `[feature].persona.acs`
+</code></pre>
+    </div>
+    <script>
+      function copyPrompt() {
+        const text = document.getElementById('prompt-text').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          const btn = document.querySelector('.copy-btn');
+          btn.textContent = 'Copied!';
+          setTimeout(() => btn.textContent = 'Copy', 2000);
+        });
+      }
+    </script>
+  
+  
   </main>
 </body>
 </html>

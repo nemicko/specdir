@@ -1,13 +1,13 @@
 {
   "name": "specdir",
-  "version": "1.0.0",
-  "description": "The open directory of Spectral domain specifications",
+  "version": "1.2.0",
+  "description": "The open directory of ACS Features",
   "scripts": {
     "validate": "node .github/scripts/validate-registry.js",
     "check-urls": "node .github/scripts/check-urls.js",
-    "validate-spectral": "node .github/scripts/validate-spectral.js",
+    "validate-acs": "node .github/scripts/validate-acs.js",
     "build": "node .github/scripts/generate-json.js && node .github/scripts/generate-site.js",
-    "validate:all": "npm run validate && npm run check-urls && npm run validate-spectral"
+    "validate:all": "npm run validate && npm run check-urls && npm run validate-acs"
   },
   "dependencies": {
     "js-yaml": "^4.1.0"

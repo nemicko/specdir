@@ -1,0 +1,33 @@
+:::ACS_METADATA
+DOMAIN: juice.users
+CONTEXT: Schema
+VERSION: 1.2.0
+:::
+
+SCHEMA User {
+  ATTRIBUTES:
+    id: uuid required generated immutable
+    email: email required unique immutable
+    username: string unique min(3) max(32) pattern("^[a-zA-Z0-9_]+$")
+    displayName: string required min(1) max(64)
+    avatarUrl: url optional
+    role: enum(admin, member, guest) required default(member)
+    status: enum(active, suspended, pending, deleted) required default(active)
+    locale: locale optional default("en")
+    createdAt: datetime required generated immutable
+    updatedAt: datetime required generated
+
+  RELATIONSHIPS:
+    profile: hasOne LocalProfile optional lazy
+    roles: hasMany LocalRoleAssignment
+
+  CONSTRAINTS:
+    - A user with status=deleted is not resolvable by public contracts.
+    - Email must be verified before transition pending -> active.
+    - Only admin role may mutate role.
+
+  IMMUTABLE:
+    - id
+    - email
+    - createdAt
+}

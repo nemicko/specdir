@@ -1,0 +1,108 @@
+:::ACS_METADATA
+DOMAIN: juice.users
+CONTEXT: Contract
+VERSION: 1.2.0
+IMPORT:
+  - juice.auth.Contract AS Auth
+  - juice.storage.Contract AS Storage
+:::
+
+CONTRACT RegisterUser {
+  INPUT:
+    - email
+    - displayName
+    - username
+    - role
+    - locale
+  LOGIC: |
+    1. EXECUTE Flow.PrepareNewUser
+    2. PERSIST Schema.User
+    3. EMIT user.created
+  INTERFACE:
+    - REST: POST /users
+}
+
+CONTRACT InviteUser {
+  INPUT:
+    - email
+    - role
+  AUTHZ: admin
+  LOGIC: |
+    1. EXECUTE Flow.PrepareNewUser
+    2. SET Schema.User.status = pending
+    3. EMIT user.invited
+  INTERFACE:
+    - REST: POST /users/invite
+}
+
+CONTRACT SuspendUser {
+  INPUT:
+    - userId
+  AUTHZ: admin
+  LOGIC: |
+    1. REQUIRES Schema.User.status == active
+    2. EXECUTE Flow.SuspendAccess
+  INTERFACE:
+    - REST: POST /users/{id}/suspend
+}
+
+CONTRACT ReactivateUser {
+  INPUT:
+    - userId
+  AUTHZ: admin
+  LOGIC: |
+    1. REQUIRES Schema.User.status == suspended
+    2. SET Schema.User.status = active
+    3. EMIT user.reactivated
+  INTERFACE:
+    - REST: POST /users/{id}/reactivate
+}
+
+CONTRACT EditUser {
+  INPUT:
+    - displayName
+    - username
+    - avatarUrl
+    - locale
+  AUTHZ:
+    - admin:any
+    - member:self
+  LOGIC: |
+    1. UPDATE mutable Schema.User fields only
+    2. CALL Storage.ResolveAvatarUrl when avatar changes
+    3. EMIT user.updated
+  INTERFACE:
+    - REST: PATCH /users/{id}
+}
+
+CONTRACT ChangeUserRole {
+  INPUT:
+    - role
+  AUTHZ: admin
+  LOGIC: |
+    1. SET Schema.User.role
+    2. EMIT user.role_changed
+  INTERFACE:
+    - REST: POST /users/{id}/role
+}
+
+CONTRACT DeleteUser {
+  INPUT:
+    - userId
+  AUTHZ: admin
+  LOGIC: |
+    1. EXECUTE Flow.SoftDeleteUser
+  INTERFACE:
+    - REST: DELETE /users/{id}
+}
+
+CONTRACT UsersAPI {
+  LOGIC: |
+    1. GET /users returns list of non-deleted users with role/status/search filters.
+    2. GET /users/{id} returns single user if requester is admin or self.
+    3. All endpoints REQUIRE Auth.ValidateSession.
+  INTERFACE:
+    - REST: GET /users
+    - REST: GET /users/{id}
+    - MCP: serves {Schema.User, Persona.AdminDirectory, Persona.UserProfile}
+}
