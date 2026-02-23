@@ -51,6 +51,10 @@ function copyLocalFeatureFiles(featureName, targetDir) {
   fs.cpSync(sourceDir, targetDir, { recursive: true });
 }
 
+function previewFileName(fileName) {
+  return `${fileName}.html`;
+}
+
 const css = `
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0f172a; background: linear-gradient(160deg, #ecfeff, #f0f9ff); }
@@ -282,7 +286,17 @@ const specPage = layout(
 function generateFeaturePage(feature) {
   const fileNames = contextFilesForFeature(feature.name);
   const rowsHtml = fileNames
-    .map((f) => `<tr><td><a href="./${f}" target="_blank">${f}</a></td></tr>`)
+    .map(
+      (f) => `
+      <tr>
+        <td><a href="./preview/${previewFileName(f)}">${f}</a></td>
+        <td>
+          <a href="./${f}" target="_blank" rel="noopener noreferrer">Raw</a>
+          &nbsp;|&nbsp;
+          <a href="./${f}" download>Download</a>
+        </td>
+      </tr>`
+    )
     .join('');
 
   const alias = feature.name.split('.').pop().replace(/[^a-zA-Z0-9]/g, '');
@@ -329,7 +343,7 @@ function generateFeaturePage(feature) {
 
     <h2>Context Files</h2>
     <table>
-      <thead><tr><th>File</th></tr></thead>
+      <thead><tr><th>File</th><th>Actions</th></tr></thead>
       <tbody>
         ${rowsHtml}
       </tbody>
@@ -342,6 +356,27 @@ function generateFeaturePage(feature) {
     ${promptSection}
   `,
     2
+  );
+}
+
+function generatePreviewPage(feature, fileName, content) {
+  return layout(
+    `${feature.name} / ${fileName}`,
+    'directory',
+    `
+    <div class="feature-header">
+      <h2>${escapeHtml(fileName)}</h2>
+      <p>Preview for <strong>${escapeHtml(feature.name)}</strong></p>
+      <div class="actions">
+        <a href="../index.html" class="btn btn-secondary">Back to Feature</a>
+        <a href="../${fileName}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">Open Raw File</a>
+        <a href="../${fileName}" download class="btn btn-secondary">Download</a>
+      </div>
+    </div>
+
+    <pre><code>${escapeHtml(content)}</code></pre>
+  `,
+    3
   );
 }
 
@@ -364,6 +399,18 @@ for (const feature of features) {
   fs.mkdirSync(featureDir, { recursive: true });
   copyLocalFeatureFiles(feature.name, featureDir);
   fs.writeFileSync(`${featureDir}/index.html`, generateFeaturePage(feature));
+
+  const previewDir = `${featureDir}/preview`;
+  fs.mkdirSync(previewDir, { recursive: true });
+  for (const fileName of contextFilesForFeature(feature.name)) {
+    const filePath = `${featureDir}/${fileName}`;
+    if (!fs.existsSync(filePath)) continue;
+    const rawContent = fs.readFileSync(filePath, 'utf8');
+    fs.writeFileSync(
+      `${previewDir}/${previewFileName(fileName)}`,
+      generatePreviewPage(feature, fileName, rawContent)
+    );
+  }
 }
 
 if (fs.existsSync('./CNAME')) {
