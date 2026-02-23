@@ -80,86 +80,208 @@
   <div style="background:#fff;border-radius:12px;padding:2rem;box-shadow:0 1px 4px rgba(0,0,0,0.07)">
     <h2>Application Context Language (ACL) v1.2</h2>
 
-<p>ACL is a declarative, language-agnostic protocol for software requirements. It shifts development from imperative coding (how) to feature definition (what).</p>
+<p>Software products are defined in many places — database schemas, API routes, UI mockups, user stories, acceptance criteria — each owned by a different team, expressed in a different format, and revised on a different cadence. The result is a fragmented source of truth. When a product manager describes a feature, the description is re-interpreted by backend engineers, frontend engineers, designers, and QA, each translating the same intent into their own medium. Drift is inevitable. Details are lost, duplicated, or contradicted.</p>
 
-<p>An ACL Feature defines a complete slice of your product — what it is, how it behaves, and how it's experienced.</p>
+<p>ACL addresses this by providing a single, declarative format for defining what a feature <em>is</em> — its data, its behavior, its rules, and its user experience — independent of any programming language, framework, or runtime. An ACL definition is precise enough for machines to consume and generate code from, yet readable enough for a product team to review and approve. It is not pseudocode, and it is not documentation. It is a structured specification that sits upstream of both.</p>
+
+<p>The scope of ACL is the <em>product layer</em>: the features a system offers and the rules that govern them. It intentionally says nothing about infrastructure, deployment topology, or performance tuning. Those concerns belong downstream, informed by — but not defined in — an ACL feature set.</p>
+
 <p>Write it once. Build it anywhere.</p>
 
-<h2>1. Structural Unit: Feature</h2>
+<hr style="border:none;border-top:1px solid #99f6e4;margin:2rem 0">
 
-<p>The primary unit is a <strong>Feature</strong> (bounded context), named:</p>
+<h2>1. The Feature</h2>
 
-<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">company.subsystem</code> (example: <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">xyz.users</code>)</p>
+<p>The primary unit of organization in ACL is the <strong>Feature</strong>. A Feature represents a self-contained slice of product functionality that owns its data shape, its internal processes, its external promises, and its user-facing surfaces. It is analogous to a bounded context in domain-driven design: everything inside a Feature is cohesive, and everything outside is accessed through explicit, controlled interfaces.</p>
 
-<p>Physical layout:</p>
+<p>Every Feature is identified by a two-part namespace following the pattern <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">company.subsystem</code> — for example, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.users</code> or <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.billing</code>. This naming convention prevents collisions when multiple teams or products contribute features to the same system, and it makes every reference unambiguous regardless of where it appears.</p>
 
-<pre><code>/features/[feature.name]/&#10;  ├── [feature].schema.acl&#10;  ├── [feature].flow.acl&#10;  ├── [feature].contract.acl&#10;  └── [feature].persona.acl&#10;</code></pre>
+<p>A Feature is always expressed as exactly four files, each responsible for one <em>context</em> of the feature's definition. This separation is enforced, not suggested — it ensures that data concerns never bleed into UI definitions, and that business logic never hides inside rendering instructions.</p>
+
+<pre><code>/features/juice.users/&#10;  ├── users.schema.acl&#10;  ├── users.flow.acl&#10;  ├── users.contract.acl&#10;  └── users.persona.acl&#10;</code></pre>
+
+<p>The four contexts — Schema, Flow, Contract, and Persona — are described in detail below.</p>
+
+<hr style="border:none;border-top:1px solid #99f6e4;margin:2rem 0">
 
 <h2>2. The Four Contexts</h2>
 
-<h3>Schema (Data Context)</h3>
+<p>Every feature is decomposed into four complementary perspectives. Together they answer four questions: <em>What does the data look like? What happens internally? What does the system promise externally? What does the user see and do?</em> No single context answers all four questions, and no question is answered by more than one context. This orthogonality is the foundation of ACL's design.</p>
 
-<p>Defines static ground truth:</p>
-<p>- entities</p>
-<p>- attributes</p>
-<p>- data types</p>
-<p>- relationships</p>
+<h3>2.1 Schema — The Data Context</h3>
 
-<h3>Flow (Mechanism Context)</h3>
+<p>A Schema defines what a feature's data looks like at rest. It describes entities, their attributes, data types, relationships, and integrity constraints — the static ground truth that every other context builds upon. A Schema is declarative: it states <em>what exists</em>, not how it got there or who is allowed to change it.</p>
 
-<p>Defines internal engine behavior:</p>
-<p>- private procedures</p>
-<p>- background tasks</p>
-<p>- auto-triggers</p>
-<p>- internal state changes</p>
+<strong>Properties:</strong>
 
-<h3>Contract (Business Logic + Interface Context)</h3>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">SCHEMA</code> — declares a named entity</p>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">ATTRIBUTES</code> — lists the entity's fields, each with a type and optional modifiers (<code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">required</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">optional</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">unique</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">generated</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">immutable</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">default(...)</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">min(...)</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">max(...)</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">pattern(...)</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">enum(...)</code>)</p>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">RELATIONSHIPS</code> — describes associations between entities (<code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">hasOne</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">hasMany</code>, with cardinality and loading hints)</p>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">CONSTRAINTS</code> — natural-language business rules that constrain data integrity</p>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">IMMUTABLE</code> — explicitly lists fields that may never change after creation</p>
 
-<p>Defines exchange layer:</p>
-<p>- public business rules</p>
-<p>- machine interfaces</p>
+<strong>Example</strong> (from <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.users</code>):
 
-<h3>Persona (View + Experience Context)</h3>
+<pre><code>SCHEMA User {&#10;  ATTRIBUTES:&#10;    id: uuid required generated immutable&#10;    email: email required unique immutable&#10;    username: string unique min(3) max(32) pattern("^[a-zA-Z0-9_]+$")&#10;    displayName: string required min(1) max(64)&#10;    avatarUrl: url optional&#10;    role: enum(admin, member, guest) required default(member)&#10;    status: enum(active, suspended, pending, deleted) required default(active)&#10;    locale: locale optional default("en")&#10;    createdAt: datetime required generated immutable&#10;    updatedAt: datetime required generated&#10;&#10;  RELATIONSHIPS:&#10;    profile: hasOne LocalProfile optional lazy&#10;    roles: hasMany LocalRoleAssignment&#10;&#10;  CONSTRAINTS:&#10;    - A user with status=deleted is not resolvable by public contracts.&#10;    - Email must be verified before transition pending -> active.&#10;    - Only admin role may mutate role.&#10;&#10;  IMMUTABLE:&#10;    - id&#10;    - email&#10;    - createdAt&#10;}&#10;</code></pre>
 
-<p>Defines human interface:</p>
-<p>- user-specific views</p>
-<p>- intent-driven UI requirements</p>
-<p>- frontend interaction logic</p>
+<strong>Boundary:</strong> A Schema never describes <em>how</em> data changes — that belongs to Flow. It never describes <em>who</em> may change it or under what authority — that belongs to Contract.
 
-<h2>3. Required Metadata Header</h2>
+<hr style="border:none;border-top:1px solid #99f6e4;margin:2rem 0">
 
-<p>Every <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">.acl</code> file starts with:</p>
+<h3>2.2 Flow — The Mechanism Context</h3>
 
-<pre><code>:::ACL_METADATA&#10;DOMAIN: [namespace.name]&#10;CONTEXT: [Schema | Flow | Contract | Persona]&#10;VERSION: [SemVer]&#10;IMPORT: [Optional list of external Contracts or Schemas]&#10;:::&#10;</code></pre>
+<p>A Flow defines what a feature does behind the scenes. Flows are internal procedures — background tasks, automatic state transitions, validation pipelines — that are triggered by events but never invoked directly by a user or an external system. They represent the machinery that keeps the feature's data consistent and its domain events propagated.</p>
 
-<h2>4. Cross-Feature Reference Rules</h2>
+<p>Each Flow declares a <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">TRIGGER</code> (the event that starts it), optional preconditions via <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">REQUIRES</code>, and an ordered list of <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">STEPS</code>. Steps may mutate schema state, revoke sessions, or emit domain events to signal downstream consumers. A Flow is always private to its feature; no other feature may call it directly.</p>
 
-<p>1. <strong>Encapsulation:</strong> A feature may not access another feature's Schema or Flow.</p>
-<p>2. <strong>Exchange:</strong> Inter-feature communication happens through Contracts.</p>
-<p>3. <strong>Import syntax:</strong></p>
+<strong>Properties:</strong>
 
-<pre><code>IMPORT other.feature.Contract AS Alias&#10;</code></pre>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">FLOW</code> — declares a named internal procedure</p>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">TRIGGER</code> — the event or contract invocation that activates this flow (e.g., <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Contract.RegisterUser</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Internal.IdentityVerified</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Schema.User.updated</code>)</p>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">REQUIRES</code> — preconditions that must hold before execution</p>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">STEPS</code> — ordered operations, which may include state changes and <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Emit DomainEvent</code> statements</p>
 
-<h2>5. AI Handshake (Execution Priority)</h2>
+<strong>Example</strong> (from <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.users</code>):
 
-<p>1. <strong>Context Mapping:</strong> parse all <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">.acl</code> files and build dependency graph.</p>
-<p>2. <strong>Environment Detection:</strong> infer target language/framework/database.</p>
-<p>3. <strong>Synthesis:</strong></p>
-<p>   - new project: generate from scratch</p>
-<p>   - legacy project: generate adapter layers to map ACL to existing code/data</p>
-<p>4. <strong>Consistency Check:</strong></p>
-<p>   - every Persona action maps to a Contract</p>
-<p>   - every Contract is backed by Flow or Schema behavior</p>
+<pre><code>FLOW PrepareNewUser {&#10;  TRIGGER: Contract.RegisterUser | Contract.InviteUser&#10;  STEPS:&#10;    1. Normalize email and username.&#10;    2. Enforce Schema.User uniqueness constraints.&#10;    3. Set status=pending when identity verification is incomplete.&#10;    4. Stamp createdAt/updatedAt.&#10;}&#10;&#10;FLOW SuspendAccess {&#10;  TRIGGER: Contract.SuspendUser&#10;  REQUIRES:&#10;    - Schema.User.status == active&#10;  STEPS:&#10;    1. Set status=suspended.&#10;    2. Revoke active sessions.&#10;    3. Emit DomainEvent user.suspended.&#10;}&#10;</code></pre>
 
-<h2>6. Rule of Thumb</h2>
+<strong>Boundary:</strong> Flows are strictly internal. Any action initiated by an external caller — whether a user, an API client, or another feature — must go through a Contract, which may in turn trigger a Flow.
 
-<p>Every user-visible action maps to a Contract, and every Contract maps to at least one Flow or Schema effect.</p>
+<hr style="border:none;border-top:1px solid #99f6e4;margin:2rem 0">
 
-<h2>7. Example (<code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">xyz.billing</code>)</h2>
+<h3>2.3 Contract — The Business Logic and Interface Context</h3>
 
-<pre><code>:::ACL_METADATA&#10;DOMAIN: xyz.billing&#10;CONTEXT: Contract&#10;VERSION: 1.0.0&#10;IMPORT:&#10;  - xyz.users.Contract AS Users&#10;:::&#10;&#10;CONTRACT FinalizeInvoice {&#10;  LOGIC: |&#10;    1. CALL Users.VerifyIdentity(user_id)&#10;    2. IF valid, EXECUTE Flow.CalculateTotal&#10;    3. PERSIST Schema.Invoice&#10;&#10;  INTERFACE:&#10;    - REST: POST /billing/finalize&#10;}&#10;</code></pre>
+<p>A Contract defines what the system promises to do when asked, and under what conditions. It is the public surface of a feature: the set of operations that external callers — users, other features, API consumers — are permitted to invoke. Each Contract specifies its inputs, its authorization requirements, the logic it executes, and the interfaces through which it is accessible.</p>
 
-<pre><code>:::ACL_METADATA&#10;DOMAIN: xyz.billing&#10;CONTEXT: Persona&#10;VERSION: 1.0.0&#10;:::&#10;&#10;PERSONA Customer {&#10;  VIEW Receipt {&#10;    DISPLAY: Schema.Invoice(amount, date)&#10;    ACTION: "Print" -> System.LocalPrint&#10;  }&#10;}&#10;</code></pre>
+<p>Contracts are the <em>only</em> cross-feature boundary. When one feature needs to interact with another, it imports and calls a Contract — never a Schema or Flow directly. This encapsulation ensures that a feature's internal data model and processes can evolve without breaking consumers.</p>
+
+<strong>Properties:</strong>
+
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">CONTRACT</code> — declares a named external operation</p>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">INPUT</code> — the data required to invoke this operation</p>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">AUTHZ</code> — authorization rules (e.g., <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">admin</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">member:self</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">admin:any</code>)</p>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">LOGIC</code> — ordered steps describing what happens on invocation; uses keywords:</p>
+<p>  - <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">EXECUTE</code> — invoke a Flow</p>
+<p>  - <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">PERSIST</code> — write to a Schema entity</p>
+<p>  - <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">CALL</code> — invoke another feature's Contract (via import)</p>
+<p>  - <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">EMIT</code> — publish a domain event</p>
+<p>  - <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">SET</code> — mutate a specific schema field</p>
+<p>  - <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">REQUIRES</code> — assert a precondition</p>
+<p>  - <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">UPDATE</code> — modify mutable fields</p>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">INTERFACE</code> — the protocol endpoints that expose this operation (e.g., <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">REST: POST /users</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">MCP: serves {...}</code>)</p>
+
+<strong>Example</strong> (from <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.users</code>):
+
+<pre><code>CONTRACT RegisterUser {&#10;  INPUT:&#10;    - email&#10;    - displayName&#10;    - username&#10;    - role&#10;    - locale&#10;  LOGIC: |&#10;    1. EXECUTE Flow.PrepareNewUser&#10;    2. PERSIST Schema.User&#10;    3. EMIT user.created&#10;  INTERFACE:&#10;    - REST: POST /users&#10;}&#10;&#10;CONTRACT EditUser {&#10;  INPUT:&#10;    - displayName&#10;    - username&#10;    - avatarUrl&#10;    - locale&#10;  AUTHZ:&#10;    - admin:any&#10;    - member:self&#10;  LOGIC: |&#10;    1. UPDATE mutable Schema.User fields only&#10;    2. CALL Storage.ResolveAvatarUrl when avatar changes&#10;    3. EMIT user.updated&#10;  INTERFACE:&#10;    - REST: PATCH /users/{id}&#10;}&#10;&#10;CONTRACT ChangeUserRole {&#10;  INPUT:&#10;    - role&#10;  AUTHZ: admin&#10;  LOGIC: |&#10;    1. SET Schema.User.role&#10;    2. EMIT user.role_changed&#10;  INTERFACE:&#10;    - REST: POST /users/{id}/role&#10;}&#10;</code></pre>
+
+<p>Notice that <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">EditUser</code> uses <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">CALL Storage.ResolveAvatarUrl</code> — this references a Contract imported from the <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.storage</code> feature. The import is declared in the file's metadata header (see <a href="#4-metadata)">Section 4: Metadata</a> as <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.storage.Contract AS Storage</code>, which allows the shorthand <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Storage.ResolveAvatarUrl</code> within the logic block.</p>
+
+<strong>Boundary:</strong> A Contract never defines UI layout, display formatting, or user-facing labels. That responsibility belongs to the Persona.
+
+<hr style="border:none;border-top:1px solid #99f6e4;margin:2rem 0">
+
+<h3>2.4 Persona — The View and Experience Context</h3>
+
+<p>A Persona defines what a feature looks like and feels like to each type of user. It is the human interface layer — not a pixel-perfect design, but a declaration of <em>what information</em> each user role sees, <em>what actions</em> are available to them, and <em>what form</em> data entry takes. Personas are intentionally abstract: they specify that a field appears "as a badge" or "sortable," not that it renders as a 12px teal pill in the top-right corner. Implementation teams choose the visual treatment; the Persona defines the intent.</p>
+
+<p>Each Persona is scoped to a user role (e.g., <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Admin</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Member</code>) and contains one or more Views. A View declares <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">DISPLAY</code> items with optional modifiers and <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">ACTIONS</code> that map directly to Contracts.</p>
+
+<strong>Properties:</strong>
+
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">PERSONA</code> — declares a named user role</p>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">VIEW</code> — declares a named screen or interface within that role's experience</p>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">DISPLAY</code> — lists the data fields shown, with optional modifiers:</p>
+<p>  - <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">as [label]</code> — presentation hint (e.g., <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">as badge</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">as avatar</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">as primary</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">as relative-date</code>)</p>
+<p>  - <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">sortable</code> — the field supports sorting</p>
+<p>  - <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">filterable</code> — the field supports filtering</p>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">ACTIONS</code> — user-initiated operations, each mapping to a Contract (e.g., <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">"Suspend" -> Contract.SuspendUser</code>)</p>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">form.create</code> / <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">form.edit</code> — declares the fields included in creation and editing forms</p>
+
+<strong>Example</strong> (from <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.users</code>):
+
+<pre><code>PERSONA Admin {&#10;  VIEW Directory {&#10;    DISPLAY:&#10;      - avatarUrl as avatar&#10;      - displayName as primary sortable&#10;      - email sortable&#10;      - role as badge filterable&#10;      - status as badge filterable&#10;      - createdAt as relative-date sortable&#10;    ACTIONS:&#10;      - "Open User" -> Contract.UsersAPI(detail)&#10;      - "Suspend" -> Contract.SuspendUser&#10;      - "Reactivate" -> Contract.ReactivateUser&#10;      - "Delete" -> Contract.DeleteUser&#10;  }&#10;&#10;  VIEW UserEditor {&#10;    DISPLAY:&#10;      - form.create: [email, displayName, username, role, locale]&#10;      - form.edit: [displayName, username, avatarUrl, locale]&#10;    ACTIONS:&#10;      - "Create User" -> Contract.RegisterUser&#10;      - "Save Changes" -> Contract.EditUser&#10;      - "Change Role" -> Contract.ChangeUserRole&#10;  }&#10;}&#10;&#10;PERSONA Member {&#10;  VIEW SelfProfile {&#10;    DISPLAY:&#10;      - avatarUrl&#10;      - displayName&#10;      - email&#10;      - locale&#10;      - updatedAt&#10;    ACTIONS:&#10;      - "Edit Profile" -> Contract.EditUser&#10;  }&#10;}&#10;</code></pre>
+
+<strong>Boundary:</strong> A Persona never contains business logic, authorization rules, or data validation. Those responsibilities belong to the Contract. If a Persona declares an action, the Contract it points to is the sole authority on whether that action is permitted and what happens when it executes.
+
+<hr style="border:none;border-top:1px solid #99f6e4;margin:2rem 0">
+
+<h2>3. The Binding Rule</h2>
+
+<p>The four contexts are not independent documents that happen to sit in the same folder. They are bound together by a single traceability rule that is the backbone of ACL's integrity:</p>
+
+<p>> Every user-visible action maps to a Contract, and every Contract maps to at least one Flow or Schema effect.</p>
+
+<p>This rule creates an unbroken chain from what the user sees to what the system does:</p>
+
+<pre><code>Persona  →  Contract  →  Flow / Schema&#10;</code></pre>
+
+<p>The chain is concrete and verifiable. Consider the "Suspend" action visible to an Admin in the <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.users</code> feature:</p>
+
+<p>1. <strong>Persona:</strong> <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Admin.Directory</code> declares <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">"Suspend" -> Contract.SuspendUser</code></p>
+<p>2. <strong>Contract:</strong> <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">SuspendUser</code> requires <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">AUTHZ: admin</code>, checks that <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Schema.User.status == active</code>, and executes <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Flow.SuspendAccess</code></p>
+<p>3. <strong>Flow:</strong> <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">SuspendAccess</code> sets <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">status=suspended</code>, revokes active sessions, and emits <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">DomainEvent user.suspended</code></p>
+<p>4. <strong>Schema:</strong> <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">User.status</code> is defined as <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">enum(active, suspended, pending, deleted)</code></p>
+
+<p>Every link in this chain is explicit and traceable. If a Persona action does not point to a Contract, or a Contract does not reference a Flow or Schema, the specification is incomplete. Tooling can — and should — verify this automatically.</p>
+
+<hr style="border:none;border-top:1px solid #99f6e4;margin:2rem 0">
+
+<h2>4. Metadata</h2>
+
+<p>Every <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">.acl</code> file begins with a metadata header enclosed in <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">:::ACL_METADATA</code> delimiters. This header makes each file self-describing and machine-parseable: it identifies which feature the file belongs to, which context it defines, what version of the definition it represents, and what external dependencies it declares.</p>
+
+<pre><code>:::ACL_METADATA&#10;DOMAIN: juice.users&#10;CONTEXT: Contract&#10;VERSION: 1.2.0&#10;IMPORT:&#10;  - juice.auth.Contract AS Auth&#10;  - juice.storage.Contract AS Storage&#10;:::&#10;</code></pre>
+
+<table><tr><td>Field</td><td>Required</td><td>Purpose</td></tr>
+<p>|-------|----------|---------|</p>
+<tr><td><code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">DOMAIN</code></td><td>Yes</td><td>Feature namespace (<code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">company.subsystem</code>) — identifies which feature this file belongs to</td></tr>
+<tr><td><code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">CONTEXT</code></td><td>Yes</td><td>Which of the four contexts this file defines (<code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Schema</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Flow</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Contract</code>, or <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Persona</code>)</td></tr>
+<tr><td><code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">VERSION</code></td><td>Yes</td><td>SemVer version of this feature definition, enabling change tracking and compatibility checks</td></tr>
+<tr><td><code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">IMPORT</code></td><td>No</td><td>Dependencies on other features' Contracts, declared with an alias for use in the file body</td></tr>
+<p></table></p>
+<p>The <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">IMPORT</code> field is the mechanism by which features declare their external dependencies. Only Contracts may be imported — never Schemas or Flows. Each import uses the <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">AS</code> keyword to assign a local alias, which keeps references short and avoids naming collisions when multiple features are imported.</p>
+
+<hr style="border:none;border-top:1px solid #99f6e4;margin:2rem 0">
+
+<h2>5. Cross-Feature References</h2>
+
+<p>Encapsulation is a first-class concern in ACL. A feature's Schema and Flow are private — they define internal structure and behavior that may change at any time without notice. No other feature is permitted to reference them directly. This rule prevents tight coupling: if <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.billing</code> could read <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.users</code>'s Schema directly, any change to the User entity's field names or types could silently break the billing feature.</p>
+
+<p>The only cross-feature surface is the <strong>Contract</strong>. When one feature needs data or behavior from another, it imports that feature's Contract and calls its operations. The Contract acts as a stable interface that the owning feature is responsible for maintaining.</p>
+
+<p>In practice, this looks like the following. The <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.users</code> Contract file declares its imports in the metadata header:</p>
+
+<pre><code>IMPORT:&#10;  - juice.auth.Contract AS Auth&#10;  - juice.storage.Contract AS Storage&#10;</code></pre>
+
+<p>Within the Contract body, these imports are referenced by their alias:</p>
+
+<pre><code>LOGIC: |&#10;  1. CALL Storage.ResolveAvatarUrl when avatar changes&#10;</code></pre>
+
+<pre><code>LOGIC: |&#10;  1. All endpoints REQUIRE Auth.ValidateSession.&#10;</code></pre>
+
+<p>The <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">AS</code> keyword assigns a readable shorthand (<code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Auth</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Storage</code>) that avoids repeating the full <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.auth.Contract</code> path and prevents collisions if two imported features happen to expose operations with the same name.</p>
+
+<hr style="border:none;border-top:1px solid #99f6e4;margin:2rem 0">
+
+<h2>6. AI Execution Model</h2>
+
+<p>ACL files are designed to be consumed programmatically — by AI agents, code generators, or implementation tools that translate the specification into working software. The execution model describes the expected sequence of operations when an AI system processes an ACL feature set.</p>
+
+<h3>6.1 Parse and Map</h3>
+
+<p>The agent reads all <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">.acl</code> files in the feature directory, parses their metadata headers, and resolves <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">IMPORT</code> declarations to build a dependency graph. At the end of this step, the agent has a complete picture of every feature, every context, and every cross-feature relationship in the system.</p>
+
+<h3>6.2 Detect Environment</h3>
+
+<p>The agent determines the target environment — programming language, framework, database, authentication provider — either from explicit configuration or by inspecting the existing project. This step is what makes ACL language-agnostic: the same feature definition produces a Rails migration, a Django model, or a Prisma schema depending on the detected environment.</p>
+
+<h3>6.3 Synthesize</h3>
+
+<p>For a new (greenfield) project, the agent generates all implementation artifacts from scratch: data models from Schemas, service layers from Flows and Contracts, API routes from Contract interfaces, and UI components from Personas. For an existing (brownfield) project, the agent generates adapter layers that map ACL definitions onto the project's existing code, data, and conventions — preserving what already works while filling in what the specification requires.</p>
+
+<h3>6.4 Verify Integrity</h3>
+
+<p>The agent checks that the Binding Rule holds end-to-end: every Persona action maps to a Contract, every Contract references at least one Flow or Schema effect, and every imported Contract resolves to a real feature. This verification step catches specification gaps before they become implementation bugs.</p>
 
   </div>
 
