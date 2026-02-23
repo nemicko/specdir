@@ -1,8 +1,8 @@
-# Implement an ACS Feature
+# Implement an ACL Feature
 
-You are implementing an Application Context Script (ACS) Feature as either a new application module or a component integrated into an existing codebase.
+You are implementing an Application Context Language (ACL) Feature as either a new application module or a component integrated into an existing codebase.
 
-An ACS Feature defines a complete slice of the product: what it is, how it behaves, and how it's experienced.
+An ACL Feature defines a complete slice of the product: what it is, how it behaves, and how it's experienced.
 
 ## Step 1: Read the Protocol
 
@@ -16,10 +16,10 @@ https://specdir.com/spec
 
 Fetch the target feature folder and read all four files completely:
 
-- `[feature].schema.acs`
-- `[feature].flow.acs`
-- `[feature].contract.acs`
-- `[feature].persona.acs`
+- `[feature].schema.acl`
+- `[feature].flow.acl`
+- `[feature].contract.acl`
+- `[feature].persona.acl`
 
 Do not generate code until all four files are parsed.
 
@@ -63,14 +63,14 @@ Generate screens/components, view models/layout contracts, and UI action binding
 If integrating into an existing project:
 
 1. Keep existing architecture conventions.
-2. Generate adapter layers from ACS Contracts/Personas to existing code paths.
+2. Generate adapter layers from ACL Contracts/Personas to existing code paths.
 3. Avoid broad rewrites unless requested.
 
 ## If URL Fetch Is Unavailable
 
 Ask the user to paste:
 1. Protocol spec (`spec/README.md`)
-2. `[feature].schema.acs`
-3. `[feature].flow.acs`
-4. `[feature].contract.acs`
-5. `[feature].persona.acs`
+2. `[feature].schema.acl`
+3. `[feature].flow.acl`
+4. `[feature].contract.acl`
+5. `[feature].persona.acl`

@@ -1,5 +1,5 @@
 name: Submit Feature
-description: Request to list a new ACS Feature in specdir
+description: Request to list a new ACL Feature in specdir
 title: "Add: "
 labels: ["new-feature"]
 
@@ -16,8 +16,8 @@ body:
     id: url
     attributes:
       label: Feature Contract URL
-      description: Stable public URL to your Feature Contract `.acs` file
-      placeholder: https://yourdomain.com/features/stripe.payments/payments.contract.acs
+      description: Stable public URL to your Feature Contract `.acl` file
+      placeholder: https://yourdomain.com/features/stripe.payments/payments.contract.acl
     validations:
       required: true
 
@@ -47,7 +47,7 @@ body:
       options:
         - label: My URL is publicly reachable
           required: true
-        - label: My file includes a valid `:::ACS_METADATA` block
+        - label: My file includes a valid `:::ACL_METADATA` block
           required: true
         - label: My domain in the entry matches the URL domain
           required: true

@@ -1,8 +1,8 @@
-# Application Context Script (ACS) v1.2
+# Application Context Language (ACL) v1.2
 
-ACS is a declarative, language-agnostic protocol for software requirements. It shifts development from imperative coding (how) to feature definition (what).
+ACL is a declarative, language-agnostic protocol for software requirements. It shifts development from imperative coding (how) to feature definition (what).
 
-An ACS Feature defines a complete slice of your product — what it is, how it behaves, and how it's experienced.
+An ACL Feature defines a complete slice of your product — what it is, how it behaves, and how it's experienced.
 Write it once. Build it anywhere.
 
 ## 1. Structural Unit: Feature
@@ -15,10 +15,10 @@ Physical layout:
 
 ```text
 /features/[feature.name]/
-  ├── [feature].schema.acs
-  ├── [feature].flow.acs
-  ├── [feature].contract.acs
-  └── [feature].persona.acs
+  ├── [feature].schema.acl
+  ├── [feature].flow.acl
+  ├── [feature].contract.acl
+  └── [feature].persona.acl
 ```
 
 ## 2. The Four Contexts
@@ -54,10 +54,10 @@ Defines human interface:
 
 ## 3. Required Metadata Header
 
-Every `.acs` file starts with:
+Every `.acl` file starts with:
 
-```acs
-:::ACS_METADATA
+```acl
+:::ACL_METADATA
 DOMAIN: [namespace.name]
 CONTEXT: [Schema | Flow | Contract | Persona]
 VERSION: [SemVer]
@@ -71,17 +71,17 @@ IMPORT: [Optional list of external Contracts or Schemas]
 2. **Exchange:** Inter-feature communication happens through Contracts.
 3. **Import syntax:**
 
-```acs
+```acl
 IMPORT other.feature.Contract AS Alias
 ```
 
 ## 5. AI Handshake (Execution Priority)
 
-1. **Context Mapping:** parse all `.acs` files and build dependency graph.
+1. **Context Mapping:** parse all `.acl` files and build dependency graph.
 2. **Environment Detection:** infer target language/framework/database.
 3. **Synthesis:**
    - new project: generate from scratch
-   - legacy project: generate adapter layers to map ACS to existing code/data
+   - legacy project: generate adapter layers to map ACL to existing code/data
 4. **Consistency Check:**
    - every Persona action maps to a Contract
    - every Contract is backed by Flow or Schema behavior
@@ -92,8 +92,8 @@ Every user-visible action maps to a Contract, and every Contract maps to at leas
 
 ## 7. Example (`xyz.billing`)
 
-```acs
-:::ACS_METADATA
+```acl
+:::ACL_METADATA
 DOMAIN: xyz.billing
 CONTEXT: Contract
 VERSION: 1.0.0
@@ -112,8 +112,8 @@ CONTRACT FinalizeInvoice {
 }
 ```
 
-```acs
-:::ACS_METADATA
+```acl
+:::ACL_METADATA
 DOMAIN: xyz.billing
 CONTEXT: Persona
 VERSION: 1.0.0

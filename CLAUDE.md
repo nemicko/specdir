@@ -1,20 +1,20 @@
-# Application Context Script (ACS) — Project Context
+# Application Context Language (ACL) — Project Context
 
 Source of truth:
-- `spec/README.md` defines ACS semantics.
-- `features/*/*.acs` defines Features.
+- `spec/README.md` defines ACL semantics.
+- `features/*/*.acl` defines Features.
 - `registry.yaml` lists discoverable Features.
 
 Each Feature uses four context files:
-- `[feature].schema.acs`
-- `[feature].flow.acs`
-- `[feature].contract.acs`
-- `[feature].persona.acs`
+- `[feature].schema.acl`
+- `[feature].flow.acl`
+- `[feature].contract.acl`
+- `[feature].persona.acl`
 
 Each file includes:
 
-```acs
-:::ACS_METADATA
+```acl
+:::ACL_METADATA
 DOMAIN: company.subsystem
 CONTEXT: Schema | Flow | Contract | Persona
 VERSION: x.y.z
@@ -26,7 +26,7 @@ IMPORT:
 Commands:
 - `npm run validate`
 - `npm run check-urls`
-- `npm run validate-acs`
+- `npm run validate-acl`
 - `npm run build`
 
 Generated output:

@@ -2,7 +2,7 @@
   "version": "1.2",
   "updated": "2026-02-22",
   "maintainers": [
-    "acs/community"
+    "acl/community"
   ],
   "features": [
     {
@@ -10,7 +10,7 @@
       "description": "User identity, authentication, roles and lifecycle management.",
       "author": "juice",
       "domain": "specdir.com",
-      "url": "https://specdir.com/features/juice.users/users.contract.acs",
+      "url": "https://specdir.com/features/juice.users/users.contract.acl",
       "tags": [
         "identity",
         "auth",
@@ -21,6 +21,6 @@
       "submitted": "2026-02-22"
     }
   ],
-  "generated": "2026-02-22T19:12:03.931Z",
+  "generated": "2026-02-23T10:23:44.377Z",
   "count": 1
 }

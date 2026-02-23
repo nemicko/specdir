@@ -1,14 +1,14 @@
 version: "1.2"
 updated: "2026-02-22"
 maintainers:
-  - acs/community
+  - acl/community
 
 features:
   - name: juice.users
     description: "User identity, authentication, roles and lifecycle management."
     author: juice
     domain: specdir.com
-    url: https://specdir.com/features/juice.users/users.contract.acs
+    url: https://specdir.com/features/juice.users/users.contract.acl
     tags: [identity, auth, admin, core]
     maturity: draft
     submitted: "2026-02-22"

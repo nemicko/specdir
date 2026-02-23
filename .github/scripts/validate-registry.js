@@ -51,8 +51,8 @@ try {
       if (urls.has(feature.url)) error(id, 'duplicate url');
       else urls.add(feature.url);
 
-      if (!feature.url.endsWith('.acs')) {
-        error(id, 'url must point to a .acs file');
+      if (!feature.url.endsWith('.acl')) {
+        error(id, 'url must point to a .acl file');
       }
     }
 

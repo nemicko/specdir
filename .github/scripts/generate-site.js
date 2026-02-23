@@ -5,7 +5,7 @@ const yaml = require('js-yaml');
 const path = require('path');
 
 const REPO_URL = 'https://github.com/nemicko/specdir';
-const BRAND_ICON_DATA_URI = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22%3E%3Cstop offset=%220%25%22 stop-color=%2206b6d4%22/%3E%3Cstop offset=%22100%25%22 stop-color=%2214b8a6%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x=%224%22 y=%224%22 width=%2256%22 height=%2256%22 rx=%2216%22 fill=%22%230b1f2a%22/%3E%3Cpath d=%22M16 32c8-10 24-10 32 0-8 10-24 10-32 0Z%22 fill=%22url(%23g)%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%226%22 fill=%22%23ccfbf1%22/%3E%3C/svg%3E';
+const BRAND_ICON_DATA_URI = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect x=%224%22 y=%224%22 width=%2256%22 height=%2256%22 rx=%2216%22 fill=%22%230b1f2a%22/%3E%3Cpath d=%22M24 18L12 32L24 46%22 stroke=%22%2367e8f9%22 stroke-width=%224.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/%3E%3Cpath d=%22M40 18L52 32L40 46%22 stroke=%22%235eead4%22 stroke-width=%224.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/%3E%3Ccircle cx=%2232%22 cy=%2225%22 r=%222.5%22 fill=%22%23ffffff%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%222.5%22 fill=%22%23ffffff%22/%3E%3Ccircle cx=%2232%22 cy=%2239%22 r=%222.5%22 fill=%22%23ffffff%22/%3E%3C/svg%3E';
 
 const raw = fs.readFileSync('./registry.yaml', 'utf8');
 const registry = yaml.load(raw);
@@ -32,10 +32,10 @@ function escapeHtml(str) {
 function contextFilesForFeature(featureName) {
   const subsystem = featureName.split('.').pop();
   return [
-    `${subsystem}.schema.acs`,
-    `${subsystem}.flow.acs`,
-    `${subsystem}.contract.acs`,
-    `${subsystem}.persona.acs`,
+    `${subsystem}.schema.acl`,
+    `${subsystem}.flow.acl`,
+    `${subsystem}.contract.acl`,
+    `${subsystem}.persona.acl`,
   ];
 }
 
@@ -57,9 +57,8 @@ const css = `
   header { background: #0b1f2a; color: #f8fafc; padding: 2rem; }
   header p { margin-top: 0.5rem; color: #67e8f9; font-size: 0.95rem; }
   .brand { display: inline-flex; align-items: center; gap: 0.8rem; color: inherit; text-decoration: none; }
-  .brand-mark { width: 36px; height: 36px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(140deg, #06b6d4, #14b8a6); box-shadow: 0 8px 18px rgba(20,184,166,0.35); color: #06202a; font-size: 1rem; font-weight: 800; }
+  .brand-mark { width: 36px; height: 36px; border-radius: 10px; box-shadow: 0 8px 18px rgba(20,184,166,0.35); }
   .brand-title { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.3px; line-height: 1.1; }
-  .brand-sub { color: #5eead4; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; }
   nav { display: flex; gap: 1.25rem; margin-top: 1rem; flex-wrap: wrap; }
   nav a { color: #67e8f9; text-decoration: none; font-size: 0.9rem; }
   nav a:hover { text-decoration: underline; }
@@ -124,17 +123,16 @@ function layout(title, activePage, content, depth = 0) {
 <body>
   <header>
     <a href="${root}/index.html" class="brand">
-      <span class="brand-mark">C</span>
+      <img class="brand-mark" src="${BRAND_ICON_DATA_URI}" alt="ACL">
       <span>
-        <span class="brand-title">Application Context Script</span><br>
-        <span class="brand-sub">on specdir.com</span>
+        <span class="brand-title">Application Context Language</span>
       </span>
     </a>
-    <p>Open protocol + directory for AI-native Features.</p>
+    <p>Define intent. AI builds the stack.</p>
     <nav>
       <a href="${root}/index.html" class="${activePage === 'home' ? 'active' : ''}">Home</a>
       <a href="${root}/directory/index.html" class="${activePage === 'directory' ? 'active' : ''}">Directory</a>
-      <a href="${root}/spec/index.html" class="${activePage === 'spec' ? 'active' : ''}">Protocol Spec</a>
+      <a href="${root}/spec/index.html" class="${activePage === 'spec' ? 'active' : ''}">ACL Spec</a>
       <a href="${REPO_URL}">GitHub</a>
       <a href="${root}/registry.json">registry.json</a>
     </nav>
@@ -151,37 +149,40 @@ const homePage = layout(
   'home',
   `
   <div class="hero">
-    <h2>Stop Rewriting Product Intent In Every Stack</h2>
-    <p class="hero-lead"><strong>ACS is a declarative, language-agnostic protocol for software requirements.</strong> It shifts development from imperative coding (how) to feature definition (what).</p>
-    <p class="hero-lead"><strong>An ACS Feature defines a complete slice of your product — what it is, how it behaves, and how it's experienced.</strong></p>
-    <p class="hero-lead"><strong>Write it once. Build it anywhere.</strong></p>
-    <p>This is the open directory of ACS Features you can read, import, and implement in any stack.</p>
-    <ul class="hero-list">
-      <li>Schema defines data truth.</li>
-      <li>Flow defines internal mechanics.</li>
-      <li>Contract defines external exchange.</li>
-      <li>Persona defines user-facing experience.</li>
-    </ul>
+    <h2>The Language for AI-Built Software</h2>
+    <p class="hero-lead"><strong>ACL is source code for product intent. AI is the compiler.</strong></p>
+    <p class="hero-lead">Define what your product does — the data, the logic, the experience — in a structured, language-agnostic protocol. Hand it to any AI agent, and it generates the implementation in whatever stack you need.</p>
+    <p class="hero-lead"><strong>Write features once. AI builds them anywhere.</strong></p>
+    <p>Each ACL Feature is a complete, parseable definition of one product slice — designed for AI to read, reason about, and synthesize into working code.</p>
     <div class="nodes">
-      <div class="node"><strong>Schema</strong><span>Entities, fields, constraints, relationships</span></div>
-      <div class="node"><strong>Flow</strong><span>Triggers, jobs, internal state transitions</span></div>
-      <div class="node"><strong>Contract</strong><span>Business capabilities and API/interface exposure</span></div>
-      <div class="node"><strong>Persona</strong><span>Views and user actions mapped to contracts</span></div>
+      <div class="node"><strong>Schema</strong><span>Data truth — entities, fields, constraints, relationships</span></div>
+      <div class="node"><strong>Flow</strong><span>Internal mechanics — triggers, jobs, state transitions</span></div>
+      <div class="node"><strong>Contract</strong><span>External exchange — business rules, APIs, interfaces</span></div>
+      <div class="node"><strong>Persona</strong><span>User experience — views, actions, interaction logic</span></div>
     </div>
     <div class="actions">
-      <a href="./spec/index.html" class="btn btn-primary">Read ACS Spec</a>
+      <a href="./spec/index.html" class="btn btn-primary">Read ACL Spec</a>
       <a href="./features/juice.users/index.html" class="btn btn-secondary">See <code>juice.users</code></a>
       <a href="./directory/index.html" class="btn btn-secondary">Browse Directory</a>
       <a href="${REPO_URL}/blob/main/CONTRIBUTING.md" class="btn btn-secondary">Publish a Feature</a>
     </div>
   </div>
 
-  <h2>Why ACS Exists</h2>
-  <p>AI implementation quality depends on context quality. ACS gives teams a portable source of truth for one bounded product slice.</p>
-  <p>Instead of describing behavior across scattered code and tickets, ACS keeps each Feature in one parseable set of context files.</p>
+  <h2>Why ACL Exists</h2>
+  <p>AI can build software — but only as well as you describe it. Today, product intent lives scattered across tickets, docs, Slack threads, and developer memory. Every time you switch stacks or start fresh, you re-explain the same thing.</p>
+  <p>ACL replaces that cycle. You define each feature once — what the data looks like, how the system behaves, what gets exposed, and what the user experiences — in four structured context files. AI reads them and generates the implementation: models, APIs, UI, and wiring. In any language, any framework.</p>
 
-  <h2>For AI Agents</h2>
-  <p>Fetch the full registry programmatically:</p>
+  <h2>How It Works With AI</h2>
+  <p>An AI agent consuming ACL files follows a defined handshake:</p>
+  <ul class="hero-list">
+    <li><strong>Parse</strong> all <code>.acl</code> files and build the dependency graph.</li>
+    <li><strong>Detect</strong> the target environment — language, framework, database.</li>
+    <li><strong>Synthesize</strong> the implementation — from scratch, or as adapter layers over existing code.</li>
+    <li><strong>Verify</strong> consistency — every user action maps to a Contract, every Contract is backed by a Flow or Schema.</li>
+  </ul>
+
+  <h2>Open Feature Directory</h2>
+  <p>This is an open registry of ACL Features anyone can read, import, and implement. AI agents can fetch the full registry programmatically:</p>
   <pre><code>GET https://specdir.com/registry.yaml
 GET https://specdir.com/registry.json</code></pre>
 `,
@@ -250,7 +251,7 @@ function renderSpec(md) {
     .replace(/^## (.+)$/gm, '<h2>$1</h2>')
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
     .replace(/^---$/gm, '<hr style="border:none;border-top:1px solid #99f6e4;margin:2rem 0">')
-    .replace(/```(\w*)\n([\s\S]*?)```/gm, '<pre><code>$2</code></pre>')
+    .replace(/```(\w*)\n([\s\S]*?)```/gm, (_, _lang, code) => '<pre><code>' + code.replace(/\n/g, '&#10;') + '</code></pre>')
     .replace(/`([^`]+)`/g, '<code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/\*([^*]+)\*/g, '<em>$1</em>')
@@ -285,7 +286,7 @@ function generateFeaturePage(feature) {
     .join('');
 
   const alias = feature.name.split('.').pop().replace(/[^a-zA-Z0-9]/g, '');
-  const usageSample = `:::ACS_METADATA\nDOMAIN: acme.billing\nCONTEXT: Contract\nVERSION: 1.2.0\nIMPORT:\n  - ${feature.name}.Contract AS ${alias.charAt(0).toUpperCase() + alias.slice(1)}\n:::`;
+  const usageSample = `:::ACL_METADATA\nDOMAIN: acme.billing\nCONTEXT: Contract\nVERSION: 1.2.0\nIMPORT:\n  - ${feature.name}.Contract AS ${alias.charAt(0).toUpperCase() + alias.slice(1)}\n:::`;
 
   const prompt = promptTemplate
     ? escapeHtml(promptTemplate.replace(/\{\{FEATURE_URL\}\}/g, feature.url))
@@ -335,7 +336,7 @@ function generateFeaturePage(feature) {
     </table>
 
     <h2>Usage</h2>
-    <p>Import this Feature Contract from another <code>.acs</code> Contract file:</p>
+    <p>Import this Feature Contract from another <code>.acl</code> Contract file:</p>
     <pre><code>${usageSample}</code></pre>
 
     ${promptSection}

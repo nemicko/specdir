@@ -28,5 +28,5 @@ jobs:
       - name: Check URLs are reachable
         run: node .github/scripts/check-urls.js
 
-      - name: Validate ACS format
-        run: node .github/scripts/validate-acs.js
+      - name: Validate ACL format
+        run: node .github/scripts/validate-acl.js

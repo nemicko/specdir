@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-// Validates that each listed URL returns a valid ACS file.
-// A valid ACS file must include an ACS metadata block with DOMAIN/CONTEXT/VERSION.
+// Validates that each listed URL returns a valid ACL file.
+// A valid ACL file must include an ACL metadata block with DOMAIN/CONTEXT/VERSION.
 
 const fs = require('fs');
 const yaml = require('js-yaml');
@@ -35,7 +35,7 @@ function fetch(url) {
 }
 
 function parseMetadata(content) {
-  const match = content.match(/:::ACS_METADATA\s*([\s\S]*?)\s*:::/m);
+  const match = content.match(/:::ACL_METADATA\s*([\s\S]*?)\s*:::/m);
   if (!match) {
     return null;
   }
@@ -70,7 +70,7 @@ function validateContextForFilename(context, url) {
   try {
     const pathname = new URL(url).pathname;
     const file = pathname.split('/').pop() || '';
-    const match = file.match(/\.(schema|flow|contract|persona)\.acs$/i);
+    const match = file.match(/\.(schema|flow|contract|persona)\.acl$/i);
     if (!match) return null;
 
     const expected = match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase();
@@ -83,12 +83,12 @@ function validateContextForFilename(context, url) {
   return null;
 }
 
-function validateACS(content, url) {
+function validateACL(content, url) {
   const errors = [];
   const metadata = parseMetadata(content);
 
   if (!metadata) {
-    return ['missing :::ACS_METADATA block'];
+    return ['missing :::ACL_METADATA block'];
   }
 
   for (const field of REQUIRED_METADATA) {
@@ -109,8 +109,8 @@ function validateACS(content, url) {
     errors.push('VERSION must be SemVer (x.y.z)');
   }
 
-  if (!url.endsWith('.acs')) {
-    errors.push('registry URL must point to a .acs file');
+  if (!url.endsWith('.acl')) {
+    errors.push('registry URL must point to a .acl file');
   }
 
   if (metadata.CONTEXT) {
@@ -128,7 +128,7 @@ async function main() {
   const registry = yaml.load(raw);
   const features = registry.features || [];
 
-  console.log(`Validating ACS format for ${features.length} feature(s)...\n`);
+  console.log(`Validating ACL format for ${features.length} feature(s)...\n`);
 
   let failed = 0;
 
@@ -147,7 +147,7 @@ async function main() {
         continue;
       }
 
-      const errors = validateACS(response.body, feature.url);
+      const errors = validateACL(response.body, feature.url);
       const metadata = parseMetadata(response.body) || {};
 
       if (errors.length > 0) {
@@ -156,7 +156,7 @@ async function main() {
         failed++;
       } else {
         console.log(
-          `  OK   [${feature.name}] feature: ${metadata.DOMAIN} context: ${metadata.CONTEXT} (acs ${metadata.VERSION})`
+          `  OK   [${feature.name}] feature: ${metadata.DOMAIN} context: ${metadata.CONTEXT} (acl ${metadata.VERSION})`
         );
       }
     } catch (err) {
@@ -168,11 +168,11 @@ async function main() {
   console.log('');
 
   if (failed > 0) {
-    console.log(`ACS validation failed: ${failed} feature(s) invalid`);
+    console.log(`ACL validation failed: ${failed} feature(s) invalid`);
     process.exit(1);
   }
 
-  console.log('All features valid ACS format');
+  console.log('All features valid ACL format');
 }
 
 main();
