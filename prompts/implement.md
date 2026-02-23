@@ -20,15 +20,13 @@ Extract the four context definitions (`Schema`, `Flow`, `Contract`, `Persona`), 
 
 ## Step 2: Fetch and Parse the Feature Definition
 
-Fetch all four context files:
+Fetch the feature bundle:
 
 ```
 https://specdir.com/features/{{FEATURE_NAME}}/bundle.txt
 ```
 
-This single file contains all four context files (Schema, Flow, Contract, Persona) separated by `--- filename ---` markers.
-
-For each file:
+This single file contains all four context files (Schema, Flow, Contract, Persona) separated by `--- filename ---` markers. Split the bundle on these markers to extract each context file, then for each one:
 1. Parse the `:::ACL_METADATA` header — extract `DOMAIN`, `CONTEXT`, `VERSION`, and `IMPORT` declarations.
 2. Build the dependency graph from all `IMPORT` lines. Each import names another feature's Contract and assigns it a local alias.
 3. Parse the body into structured declarations (`SCHEMA`, `FLOW`, `CONTRACT`, `PERSONA`).
