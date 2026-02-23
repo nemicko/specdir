@@ -1,0 +1,65 @@
+:::ACL_METADATA
+DOMAIN: juice.tasks
+CONTEXT: Flow
+VERSION: 1.0.0
+:::
+
+FLOW PrepareNewTask {
+  DESCRIPTION: "Validates input and applies initial state for newly created tasks."
+  TRIGGER: Contract.CreateTask
+  STEPS:
+    1. Enforce Schema.Task.title is non-empty.
+    2. Set status=todo when no explicit status provided.
+    3. Set priority=medium when no explicit priority provided.
+    4. Stamp createdAt/updatedAt.
+}
+
+FLOW TransitionStatus {
+  DESCRIPTION: "Validates and applies a task status change, enforcing allowed transitions."
+  TRIGGER: Contract.ChangeStatus
+  REQUIRES:
+    - Transition must follow allowed path: todo -> in_progress -> done -> archived.
+  STEPS:
+    1. Validate requested status is a legal transition from current status.
+    2. Set Schema.Task.status to requested value.
+    3. Stamp updatedAt.
+    4. Emit DomainEvent task.status_changed.
+}
+
+FLOW ArchiveCompletedTask {
+  DESCRIPTION: "Moves a completed task to archived state, removing it from active views."
+  TRIGGER: Contract.ArchiveTask
+  REQUIRES:
+    - Schema.Task.status == done
+  STEPS:
+    1. Set status=archived.
+    2. Stamp updatedAt.
+    3. Emit DomainEvent task.archived.
+}
+
+FLOW DetectOverdue {
+  DESCRIPTION: "Flags tasks whose due date has passed without reaching done status."
+  TRIGGER: Internal.DailySchedule
+  REQUIRES:
+    - Schema.Task.dueDate < now
+    - Schema.Task.status != done
+    - Schema.Task.status != archived
+  STEPS:
+    1. Emit DomainEvent task.overdue for each matching task.
+}
+
+FLOW SoftDeleteTask {
+  DESCRIPTION: "Marks a task as removed. Data is retained for audit but hidden from all views."
+  TRIGGER: Contract.DeleteTask
+  STEPS:
+    1. Set status=archived.
+    2. Stamp updatedAt.
+    3. Emit DomainEvent task.deleted.
+}
+
+FLOW TouchUpdatedAt {
+  DESCRIPTION: "Keeps the updatedAt timestamp current on any task mutation."
+  TRIGGER: Schema.Task.updated
+  STEPS:
+    1. Set updatedAt=now.
+}

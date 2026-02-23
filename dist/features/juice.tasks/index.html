@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>juice.tasks — specdir.com</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect x=%224%22 y=%224%22 width=%2256%22 height=%2256%22 rx=%2216%22 fill=%22%230b1f2a%22/%3E%3Cpath d=%22M24 18L12 32L24 46%22 stroke=%22%2367e8f9%22 stroke-width=%224.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/%3E%3Cpath d=%22M40 18L52 32L40 46%22 stroke=%22%235eead4%22 stroke-width=%224.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/%3E%3Ccircle cx=%2232%22 cy=%2225%22 r=%222.5%22 fill=%22%23ffffff%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%222.5%22 fill=%22%23ffffff%22/%3E%3Ccircle cx=%2232%22 cy=%2239%22 r=%222.5%22 fill=%22%23ffffff%22/%3E%3C/svg%3E">
+  <style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0f172a; background: linear-gradient(160deg, #ecfeff, #f0f9ff); }
+  header { background: #0b1f2a; color: #f8fafc; padding: 2rem; }
+  header p { margin-top: 0.5rem; color: #67e8f9; font-size: 0.95rem; }
+  .brand { display: inline-flex; align-items: center; gap: 0.8rem; color: inherit; text-decoration: none; }
+  .brand-mark { width: 36px; height: 36px; border-radius: 10px; box-shadow: 0 8px 18px rgba(20,184,166,0.35); }
+  .brand-title { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.3px; line-height: 1.1; }
+  nav { display: flex; gap: 1.25rem; margin-top: 1rem; flex-wrap: wrap; }
+  nav a { color: #67e8f9; text-decoration: none; font-size: 0.9rem; }
+  nav a:hover { text-decoration: underline; }
+  nav a.active { color: #fff; font-weight: 600; }
+  main { max-width: 1000px; margin: 2rem auto; padding: 0 1.5rem; }
+  h2 { font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem; color: #111827; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 1.5rem 0 0.5rem; color: #111827; }
+  p { color: #374151; line-height: 1.7; margin-bottom: 1rem; }
+  a { color: #0f766e; }
+  pre { background: #1f2937; color: #f9fafb; padding: 1rem 1.25rem; border-radius: 8px; overflow-x: auto; font-size: 0.85rem; margin-bottom: 1rem; }
+  code { font-family: 'Fira Code', monospace; }
+  .search { margin-bottom: 1.5rem; }
+  .search input { width: 100%; padding: 0.75rem 1rem; border: 1px solid #a5f3fc; border-radius: 8px; font-size: 1rem; outline: none; }
+  .search input:focus { border-color: #22d3ee; box-shadow: 0 0 0 3px rgba(34,211,238,0.18); }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: 1.5rem; }
+  th { background: #ccfbf1; padding: 0.75rem 1rem; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: #0f766e; }
+  td { padding: 0.85rem 1rem; border-top: 1px solid #ccfbf1; font-size: 0.92rem; vertical-align: top; }
+  td a { color: #0f766e; text-decoration: none; font-weight: 500; }
+  td a:hover { text-decoration: underline; }
+  tr:hover td { background: #f0fdfa; }
+  .tag { background: #ccfbf1; color: #0f766e; padding: 2px 8px; border-radius: 99px; font-size: 0.75rem; margin-right: 4px; display: inline-block; }
+  .badge { padding: 2px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+  .meta { margin-top: 2rem; color: #6b7280; font-size: 0.82rem; text-align: center; padding-bottom: 3rem; }
+  .hero { background: #fff; border-radius: 12px; padding: 2rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: 2rem; }
+  .hero h2 { margin-bottom: 0.75rem; }
+  .hero-lead { font-size: 1.06rem; color: #1f2937; margin-bottom: 1.1rem; }
+  .hero-list { margin: 0.6rem 0 0.2rem 1.1rem; color: #1f2937; line-height: 1.6; }
+  .hero-list li { margin-bottom: 0.45rem; }
+  .nodes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .node { background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 8px; padding: 1rem; }
+  .node strong { display: block; color: #111827; margin-bottom: 0.25rem; font-size: 0.9rem; }
+  .node span { color: #4b5563; font-size: 0.82rem; }
+  .actions { display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; }
+  .btn { padding: 0.6rem 1.25rem; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+  .btn-primary { background: #0f766e; color: #fff; }
+  .btn-secondary { background: #f0fdfa; color: #0f766e; border: 1px solid #99f6e4; }
+  .prompt-wrap { position: relative; }
+  .prompt-wrap pre { max-height: 400px; overflow-y: auto; }
+  .copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; padding: 0.35rem 0.75rem; border: 1px solid #6b7280; border-radius: 6px; background: #374151; color: #f9fafb; font-size: 0.78rem; cursor: pointer; }
+  .copy-btn:hover { background: #4b5563; }
+  .feature-header { margin-bottom: 2rem; }
+  .feature-header h2 { margin-bottom: 0.25rem; }
+  .feature-meta { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-top: 0.5rem; }
+</style>
+</head>
+<body>
+  <header>
+    <a href="../../index.html" class="brand">
+      <img class="brand-mark" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect x=%224%22 y=%224%22 width=%2256%22 height=%2256%22 rx=%2216%22 fill=%22%230b1f2a%22/%3E%3Cpath d=%22M24 18L12 32L24 46%22 stroke=%22%2367e8f9%22 stroke-width=%224.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/%3E%3Cpath d=%22M40 18L52 32L40 46%22 stroke=%22%235eead4%22 stroke-width=%224.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/%3E%3Ccircle cx=%2232%22 cy=%2225%22 r=%222.5%22 fill=%22%23ffffff%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%222.5%22 fill=%22%23ffffff%22/%3E%3Ccircle cx=%2232%22 cy=%2239%22 r=%222.5%22 fill=%22%23ffffff%22/%3E%3C/svg%3E" alt="ACL">
+      <span>
+        <span class="brand-title">Application Context Language</span>
+      </span>
+    </a>
+    <p>Define intent. AI builds the stack.</p>
+    <nav>
+      <a href="../../index.html" class="">Home</a>
+      <a href="../../spec/index.html" class="">Specification</a>
+      <a href="../../directory/index.html" class="active">Registry</a>
+      <a href="https://github.com/nemicko/specdir">GitHub</a>
+      <a href="../../registry.json">registry.json</a>
+    </nav>
+  </header>
+  <main>
+    
+    <div class="feature-header">
+      <h2>juice.tasks</h2>
+      <p>Basic task management with priorities, assignments, and lifecycle tracking.</p>
+      <div class="feature-meta">
+        <span>by <strong>juice</strong></span>
+        <span class="badge" style="background:#6b7280;color:#fff">draft</span>
+        <span class="tag">tasks</span> <span class="tag">productivity</span> <span class="tag">demo</span>
+      </div>
+    </div>
+
+    <h2>Context Files</h2>
+    <table>
+      <thead><tr><th>File</th><th>Actions</th></tr></thead>
+      <tbody>
+        
+      <tr>
+        <td><a href="./preview/tasks.schema.acl.html">tasks.schema.acl</a></td>
+        <td>
+          <a href="./tasks.schema.acl" target="_blank" rel="noopener noreferrer">Raw</a>
+          &nbsp;|&nbsp;
+          <a href="./tasks.schema.acl" download>Download</a>
+        </td>
+      </tr>
+      <tr>
+        <td><a href="./preview/tasks.flow.acl.html">tasks.flow.acl</a></td>
+        <td>
+          <a href="./tasks.flow.acl" target="_blank" rel="noopener noreferrer">Raw</a>
+          &nbsp;|&nbsp;
+          <a href="./tasks.flow.acl" download>Download</a>
+        </td>
+      </tr>
+      <tr>
+        <td><a href="./preview/tasks.contract.acl.html">tasks.contract.acl</a></td>
+        <td>
+          <a href="./tasks.contract.acl" target="_blank" rel="noopener noreferrer">Raw</a>
+          &nbsp;|&nbsp;
+          <a href="./tasks.contract.acl" download>Download</a>
+        </td>
+      </tr>
+      <tr>
+        <td><a href="./preview/tasks.persona.acl.html">tasks.persona.acl</a></td>
+        <td>
+          <a href="./tasks.persona.acl" target="_blank" rel="noopener noreferrer">Raw</a>
+          &nbsp;|&nbsp;
+          <a href="./tasks.persona.acl" download>Download</a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <h2>Usage</h2>
+    <p>Import this Feature Contract from another <code>.acl</code> Contract file:</p>
+    <pre><code>:::ACL_METADATA
+DOMAIN: acme.billing
+CONTEXT: Contract
+VERSION: 1.2.0
+IMPORT:
+  - juice.tasks.Contract AS Tasks
+:::</code></pre>
+
+    
+    <h2>Implement with AI</h2>
+    <p>Copy this prompt into your AI coding tool to implement this Feature.</p>
+    <div class="prompt-wrap">
+      <button class="copy-btn" onclick="copyPrompt()">Copy</button>
+      <pre id="prompt-text"><code># Implement juice.tasks
+
+## What You Are Building
+
+Application Context Language (ACL) is a declarative specification format for product features. Each feature is defined in four context files — `Schema`, `Flow`, `Contract`, and `Persona` — that together describe its data shape, internal mechanisms, public interface, and user experience. ACL is language-agnostic: the same definition produces working code in any stack.
+
+You are implementing **juice.tasks**: Basic task management with priorities, assignments, and lifecycle tracking.
+
+Your job is to translate the four `.acl` files for this feature into working code in the user's technology stack. Every declaration in the spec must produce a concrete artifact. The governing rule is the **Binding Rule**: `Persona → Contract → Flow / Schema`. Every user-visible action maps to a Contract, and every Contract maps to at least one Flow or Schema effect.
+
+## Step 1: Read the Specification
+
+Fetch the ACL protocol spec:
+
+```
+https://specdir.com/spec
+```
+
+Extract the four context definitions (`Schema`, `Flow`, `Contract`, `Persona`), the Binding Rule, the metadata format (`DOMAIN`, `CONTEXT`, `VERSION`, `IMPORT`), and the cross-feature encapsulation rules. This is the protocol — treat it as authoritative for all terminology and structural requirements.
+
+## Step 2: Fetch and Parse the Feature Definition
+
+Fetch all four context files:
+
+```
+https://specdir.com/features/juice.tasks/tasks.schema.acl
+https://specdir.com/features/juice.tasks/tasks.flow.acl
+https://specdir.com/features/juice.tasks/tasks.contract.acl
+https://specdir.com/features/juice.tasks/tasks.persona.acl
+```
+
+For each file:
+1. Parse the `:::ACL_METADATA` header — extract `DOMAIN`, `CONTEXT`, `VERSION`, and `IMPORT` declarations.
+2. Build the dependency graph from all `IMPORT` lines. Each import names another feature's Contract and assigns it a local alias.
+3. Parse the body into structured declarations (`SCHEMA`, `FLOW`, `CONTRACT`, `PERSONA`).
+
+**Do not generate code until all four files are parsed.** The contexts reference each other and incomplete parsing leads to broken output.
+
+## Step 3: Confirm the Target Environment
+
+Ask the user for:
+
+1. **Language** — determines type mappings, idioms, and package conventions
+2. **Backend framework** — determines routing, middleware, and service patterns
+3. **Frontend framework** — determines component model, state management, and rendering
+4. **Database / ORM** — determines how Schema constraints become migrations and queries
+5. **UI component library** — determines how Persona display modifiers map to components
+
+If the user provides a project directory, inspect it to detect the stack automatically (package.json, Gemfile, requirements.txt, go.mod, etc.). Adapt all generated code to the detected stack's conventions, file structure, and naming patterns.
+
+## Step 4: Generate the Data Layer — from Schema
+
+For each `SCHEMA` entity, produce:
+
+1. **Typed model or class** — map every attribute to the target language's type system. ACL types (`uuid`, `email`, `url`, `datetime`, `locale`, `string`, `enum(...)`) each have a canonical target type.
+2. **Database migration** — include column types, `NOT NULL` for `required`, unique indexes for `unique`, enum types or check constraints for `enum(...)`, and `default(...)` values.
+3. **Validation module** — enforce every modifier: `min(n)` and `max(n)` as length/range checks, `pattern(&quot;...&quot;)` as regex validation, `required` as presence checks, `unique` as uniqueness queries, `enum(...)` as inclusion checks.
+4. **Immutability guards** — every field listed under `IMMUTABLE` must be write-protected. Use pre-update hooks, readonly annotations, or equivalent mechanisms to prevent mutation after creation.
+
+Map `RELATIONSHIPS` to foreign keys, join tables, or embedded references as appropriate for the ORM. `hasOne` and `hasMany` with cardinality hints (`optional`, `lazy`) should inform loading strategy.
+
+Translate `CONSTRAINTS` into coded invariants — validation rules, database triggers, or application-level checks depending on the stack.
+
+**Rule:** every modifier in the ACL must appear in at least one generated artifact. If a modifier has no representation in the output, the generation is incomplete.
+
+## Step 5: Generate Internal Mechanisms — from Flow
+
+For each `FLOW`, produce:
+
+1. **Service function or handler** — named after the Flow (e.g., `FLOW PrepareNewUser` → `prepareNewUser` function).
+2. **Guard clauses** — from `REQUIRES` preconditions. Each `REQUIRES` line becomes an early-return or exception if the condition is not met.
+3. **Step implementation** — each numbered step in `STEPS` becomes concrete logic: field mutations, session revocations, timestamp updates, or other operations described.
+4. **Domain event types** — for every `Emit DomainEvent` statement, define an event type and publish it through the stack's event system.
+
+Map triggers to invocation patterns:
+- `Contract.*` triggers → direct calls from the named contract's handler
+- `Internal.*` triggers → event listeners or application-level hooks
+- `Schema.*` triggers → database hooks, model callbacks, or change-data-capture listeners
+
+**Rule:** Flows are private to the feature. Never expose a Flow as a public endpoint. Never allow another feature to import or call a Flow directly.
+
+## Step 6: Generate the Public Interface — from Contract
+
+For each `CONTRACT`, produce:
+
+1. **Route or endpoint** — from `INTERFACE` lines. `REST: POST /users` → a POST handler at `/users`. `REST: GET /users/{id}` → a GET handler with a path parameter. `MCP: serves {...}` → the appropriate MCP tool registration.
+2. **Input validation** — from `INPUT` fields. Cross-reference Schema to determine types, required/optional status, and constraints for each input field.
+3. **Authorization middleware** — from `AUTHZ` rules:
+   - `admin` → require admin role
+   - `member:self` → require member role AND resource ownership
+   - `admin:any` → require admin role, no ownership constraint
+   - No `AUTHZ` block → public (or system-default auth)
+4. **Handler body** — translate each `LOGIC` line using this keyword-to-code mapping:
+   - `EXECUTE Flow.X` → call the corresponding Flow service function
+   - `PERSIST Schema.X` → create/save the entity via the ORM
+   - `CALL Alias.Operation` → invoke the imported feature's contract through a client interface or adapter
+   - `EMIT event.name` → publish a domain event
+   - `SET Schema.X.field` → targeted field update on the entity
+   - `REQUIRES condition` → precondition guard; reject with appropriate error if unmet
+   - `UPDATE mutable Schema.X fields only` → apply input to all mutable fields (exclude `IMMUTABLE` fields)
+5. **Import adapters** — for each `IMPORT` in the metadata, generate a client interface, adapter, or service stub that the handler can call. This is the cross-feature integration point.
+
+**Rule:** Contracts are the only public surface of a feature. Never expose Schema models or Flow functions directly to external callers or other features.
+
+## Step 7: Generate the User Experience — from Persona
+
+For each `PERSONA` and its `VIEW` blocks, produce:
+
+1. **Page or component** — scoped to the persona's role. An `Admin` persona produces admin-facing views; a `Member` persona produces member-facing views.
+2. **Field rendering** — map each `DISPLAY` item's modifiers to UI components:
+   - `as avatar` → image/avatar component
+   - `as badge` → colored label or chip
+   - `as primary` → prominent/headline text treatment
+   - `as relative-date` → time-ago or relative date display
+   - `sortable` → column sort controls or sort state
+   - `filterable` → filter dropdown, search, or facet controls
+3. **Forms** — `form.create` and `form.edit` declarations define which fields appear in creation and editing forms. Derive field types, validation rules, and required/optional status from the Schema.
+4. **Action bindings** — each `ACTIONS` entry maps a button, menu item, or trigger to a Contract endpoint. `&quot;Suspend&quot; -&gt; Contract.SuspendUser` → a button labeled &quot;Suspend&quot; that calls the SuspendUser API.
+
+**Rule:** Persona components contain no business logic, no authorization checks, and no direct data validation. The Contract decides what is permitted; the Persona displays the result. If an action is unauthorized, the Contract rejects it — the Persona simply shows the outcome.
+
+## Step 8: Verify the Binding Rule
+
+Run three verification passes against your generated output:
+
+1. **Forward trace** — for every action in every Persona, confirm it maps to a Contract. For every Contract, confirm it references at least one Flow (`EXECUTE`) or Schema effect (`PERSIST`, `SET`, `UPDATE`). If a Persona action has no Contract, or a Contract has no backing operation, the chain is broken.
+
+2. **Reverse trace** — for every Schema field referenced in a Contract's `INPUT`, `LOGIC`, or a Persona's `DISPLAY`, confirm the field actually exists in the Schema definition. Flag any reference to a field that is not declared.
+
+3. **Cross-feature trace** — for every `IMPORT` in the metadata, confirm your generated code includes a corresponding client interface, adapter, or stub. For every `CALL Alias.Operation` in Contract logic, confirm the call is wired to the import adapter.
+
+If any link is broken, report it as a specification gap and ask the user how to proceed. Do not silently fill gaps with assumptions.
+
+## Step 9: Integrating into an Existing Codebase
+
+When the user has an existing project:
+
+- Preserve existing architecture, naming conventions, and file structure. Do not reorganize the project.
+- Generate adapter layers that bridge ACL Contract endpoints to existing code paths.
+- When existing models overlap with Schema entities, extend them with missing fields and constraints rather than replacing them.
+- Map Contract `INTERFACE` endpoints to the project's existing routing patterns and middleware stack.
+- Reuse existing authentication, authorization, and event systems rather than introducing new ones.
+- Do not rewrite existing functionality unless explicitly asked.
+
+## Step 10: If URL Fetch Is Unavailable
+
+If you cannot fetch URLs, ask the user to paste the following content in order:
+
+1. The ACL specification (from `spec/README.md`), or confirm proceeding without it
+2. The Schema file: `tasks.schema.acl`
+3. The Flow file: `tasks.flow.acl`
+4. The Contract file: `tasks.contract.acl`
+5. The Persona file: `tasks.persona.acl`
+
+Once all content is provided, proceed from Step 3 (Confirm the Target Environment).
+</code></pre>
+    </div>
+    <script>
+      function copyPrompt() {
+        const text = document.getElementById('prompt-text').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          const btn = document.querySelector('.copy-btn');
+          btn.textContent = 'Copied!';
+          setTimeout(() => btn.textContent = 'Copy', 2000);
+        });
+      }
+    </script>
+  
+  
+  </main>
+</body>
+</html>

@@ -1,0 +1,36 @@
+:::ACL_METADATA
+DOMAIN: juice.tasks
+CONTEXT: Schema
+VERSION: 1.0.0
+:::
+
+SCHEMA Task {
+  DESCRIPTION: "A trackable unit of work with priority, ownership, and lifecycle state."
+
+  ATTRIBUTES:
+    id: uuid required generated immutable
+      DESCRIPTION: "Globally unique identifier assigned at creation."
+    title: string required min(1) max(200)
+      DESCRIPTION: "Short summary describing the work to be done."
+    description: string optional max(4000)
+      DESCRIPTION: "Detailed explanation, acceptance criteria, or notes."
+    status: enum(todo, in_progress, done, archived) required default(todo)
+      DESCRIPTION: "Lifecycle state governing task visibility and available transitions."
+    priority: enum(low, medium, high, urgent) required default(medium)
+      DESCRIPTION: "Relative importance used for sorting and triage."
+    assignee: string optional max(64)
+      DESCRIPTION: "Display name of the person responsible for this task."
+    dueDate: date optional
+      DESCRIPTION: "Target completion date. Null means no deadline."
+    createdAt: datetime required generated immutable
+    updatedAt: datetime required generated
+
+  CONSTRAINTS:
+    - A task with status=archived is not resolvable by public list contracts.
+    - Status transitions follow: todo -> in_progress -> done -> archived.
+    - Only admin may archive or delete tasks belonging to other users.
+
+  IMMUTABLE:
+    - id
+    - createdAt
+}

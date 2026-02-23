@@ -12,3 +12,11 @@ features:
     tags: [identity, auth, admin, core]
     maturity: draft
     submitted: "2026-02-22"
+  - name: juice.tasks
+    description: "Basic task management with priorities, assignments, and lifecycle tracking."
+    author: juice
+    domain: specdir.com
+    url: https://specdir.com/features/juice.tasks/tasks.contract.acl
+    tags: [tasks, productivity, demo]
+    maturity: draft
+    submitted: "2026-02-23"

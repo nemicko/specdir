@@ -1,0 +1,101 @@
+:::ACL_METADATA
+DOMAIN: juice.tasks
+CONTEXT: Contract
+VERSION: 1.0.0
+:::
+
+CONTRACT CreateTask {
+  DESCRIPTION: "Creates a new task with default todo status."
+  INPUT:
+    - title
+    - description
+    - priority
+    - assignee
+    - dueDate
+  AUTHZ:
+    - admin:any
+    - member:any
+  LOGIC: |
+    1. EXECUTE Flow.PrepareNewTask
+    2. PERSIST Schema.Task
+    3. EMIT task.created
+  INTERFACE:
+    - REST: POST /tasks
+}
+
+CONTRACT EditTask {
+  DESCRIPTION: "Updates mutable fields on an existing task."
+  INPUT:
+    - title
+    - description
+    - priority
+    - dueDate
+  AUTHZ:
+    - admin:any
+    - member:self
+  LOGIC: |
+    1. UPDATE mutable Schema.Task fields only
+    2. EMIT task.updated
+  INTERFACE:
+    - REST: PATCH /tasks/{id}
+}
+
+CONTRACT ChangeStatus {
+  DESCRIPTION: "Transitions a task to a new lifecycle status."
+  INPUT:
+    - status
+  AUTHZ:
+    - admin:any
+    - member:self
+  LOGIC: |
+    1. EXECUTE Flow.TransitionStatus
+  INTERFACE:
+    - REST: POST /tasks/{id}/status
+}
+
+CONTRACT AssignTask {
+  DESCRIPTION: "Sets or clears the assignee on a task."
+  INPUT:
+    - assignee
+  AUTHZ:
+    - admin:any
+    - member:self
+  LOGIC: |
+    1. SET Schema.Task.assignee
+    2. EMIT task.assigned
+  INTERFACE:
+    - REST: POST /tasks/{id}/assign
+}
+
+CONTRACT ArchiveTask {
+  DESCRIPTION: "Archives a completed task, removing it from active lists."
+  INPUT:
+    - taskId
+  AUTHZ: admin
+  LOGIC: |
+    1. REQUIRES Schema.Task.status == done
+    2. EXECUTE Flow.ArchiveCompletedTask
+  INTERFACE:
+    - REST: POST /tasks/{id}/archive
+}
+
+CONTRACT DeleteTask {
+  DESCRIPTION: "Soft-deletes a task by archiving it. Data retained for audit."
+  INPUT:
+    - taskId
+  AUTHZ: admin
+  LOGIC: |
+    1. EXECUTE Flow.SoftDeleteTask
+  INTERFACE:
+    - REST: DELETE /tasks/{id}
+}
+
+CONTRACT TasksAPI {
+  DESCRIPTION: "Read-only endpoints for listing and retrieving tasks."
+  LOGIC: |
+    1. GET /tasks returns list of non-archived tasks with status/priority/assignee filters.
+    2. GET /tasks/{id} returns single task if requester is admin or assignee.
+  INTERFACE:
+    - REST: GET /tasks
+    - REST: GET /tasks/{id}
+}
