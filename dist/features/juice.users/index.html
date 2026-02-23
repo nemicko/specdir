@@ -167,11 +167,10 @@ Extract the four context definitions (`Schema`, `Flow`, `Contract`, `Persona`), 
 Fetch all four context files:
 
 ```
-https://specdir.com/features/juice.users/users.schema.acl
-https://specdir.com/features/juice.users/users.flow.acl
-https://specdir.com/features/juice.users/users.contract.acl
-https://specdir.com/features/juice.users/users.persona.acl
+https://specdir.com/features/juice.users/bundle.txt
 ```
+
+This single file contains all four context files (Schema, Flow, Contract, Persona) separated by `--- filename ---` markers.
 
 For each file:
 1. Parse the `:::ACL_METADATA` header — extract `DOMAIN`, `CONTEXT`, `VERSION`, and `IMPORT` declarations.

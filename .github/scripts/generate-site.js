@@ -432,6 +432,7 @@ for (const feature of features) {
 
   const previewDir = `${featureDir}/preview`;
   fs.mkdirSync(previewDir, { recursive: true });
+  const bundleParts = [];
   for (const fileName of contextFilesForFeature(feature.name)) {
     const filePath = `${featureDir}/${fileName}`;
     if (!fs.existsSync(filePath)) continue;
@@ -440,6 +441,10 @@ for (const feature of features) {
       `${previewDir}/${previewFileName(fileName)}`,
       generatePreviewPage(feature, fileName, rawContent)
     );
+    bundleParts.push(`--- ${fileName} ---\n${rawContent}`);
+  }
+  if (bundleParts.length) {
+    fs.writeFileSync(`${featureDir}/bundle.txt`, bundleParts.join('\n\n'));
   }
 }
 

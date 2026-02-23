@@ -23,11 +23,10 @@ Extract the four context definitions (`Schema`, `Flow`, `Contract`, `Persona`), 
 Fetch all four context files:
 
 ```
-{{FEATURE_BASE_URL}}/{{SUBSYSTEM}}.schema.acl
-{{FEATURE_BASE_URL}}/{{SUBSYSTEM}}.flow.acl
-{{FEATURE_BASE_URL}}/{{SUBSYSTEM}}.contract.acl
-{{FEATURE_BASE_URL}}/{{SUBSYSTEM}}.persona.acl
+https://specdir.com/features/{{FEATURE_NAME}}/bundle.txt
 ```
+
+This single file contains all four context files (Schema, Flow, Contract, Persona) separated by `--- filename ---` markers.
 
 For each file:
 1. Parse the `:::ACL_METADATA` header — extract `DOMAIN`, `CONTEXT`, `VERSION`, and `IMPORT` declarations.

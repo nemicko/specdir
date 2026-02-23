@@ -1,0 +1,245 @@
+--- users.schema.acl ---
+:::ACL_METADATA
+DOMAIN: juice.users
+CONTEXT: Schema
+VERSION: 1.2.0
+:::
+
+SCHEMA User {
+  ATTRIBUTES:
+    id: uuid required generated immutable
+    email: email required unique immutable
+    username: string unique min(3) max(32) pattern("^[a-zA-Z0-9_]+$")
+    displayName: string required min(1) max(64)
+    avatarUrl: url optional
+    role: enum(admin, member, guest) required default(member)
+    status: enum(active, suspended, pending, deleted) required default(active)
+    locale: locale optional default("en")
+    createdAt: datetime required generated immutable
+    updatedAt: datetime required generated
+
+  RELATIONSHIPS:
+    profile: hasOne LocalProfile optional lazy
+    roles: hasMany LocalRoleAssignment
+
+  CONSTRAINTS:
+    - A user with status=deleted is not resolvable by public contracts.
+    - Email must be verified before transition pending -> active.
+    - Only admin role may mutate role.
+
+  IMMUTABLE:
+    - id
+    - email
+    - createdAt
+}
+
+
+--- users.flow.acl ---
+:::ACL_METADATA
+DOMAIN: juice.users
+CONTEXT: Flow
+VERSION: 1.2.0
+:::
+
+FLOW PrepareNewUser {
+  TRIGGER: Contract.RegisterUser | Contract.InviteUser
+  STEPS:
+    1. Normalize email and username.
+    2. Enforce Schema.User uniqueness constraints.
+    3. Set status=pending when identity verification is incomplete.
+    4. Stamp createdAt/updatedAt.
+}
+
+FLOW ActivateVerifiedUser {
+  TRIGGER: Internal.IdentityVerified
+  REQUIRES:
+    - Schema.User.status == pending
+  STEPS:
+    1. Set status=active.
+    2. Stamp updatedAt.
+    3. Emit DomainEvent user.activated.
+}
+
+FLOW SuspendAccess {
+  TRIGGER: Contract.SuspendUser
+  REQUIRES:
+    - Schema.User.status == active
+  STEPS:
+    1. Set status=suspended.
+    2. Revoke active sessions.
+    3. Emit DomainEvent user.suspended.
+}
+
+FLOW SoftDeleteUser {
+  TRIGGER: Contract.DeleteUser
+  STEPS:
+    1. Set status=deleted.
+    2. Invalidate auth sessions.
+    3. Emit DomainEvent user.deleted.
+}
+
+FLOW TouchUpdatedAt {
+  TRIGGER: Schema.User.updated
+  STEPS:
+    1. Set updatedAt=now.
+}
+
+
+--- users.contract.acl ---
+:::ACL_METADATA
+DOMAIN: juice.users
+CONTEXT: Contract
+VERSION: 1.2.0
+IMPORT:
+  - juice.auth.Contract AS Auth
+  - juice.storage.Contract AS Storage
+:::
+
+CONTRACT RegisterUser {
+  INPUT:
+    - email
+    - displayName
+    - username
+    - role
+    - locale
+  LOGIC: |
+    1. EXECUTE Flow.PrepareNewUser
+    2. PERSIST Schema.User
+    3. EMIT user.created
+  INTERFACE:
+    - REST: POST /users
+}
+
+CONTRACT InviteUser {
+  INPUT:
+    - email
+    - role
+  AUTHZ: admin
+  LOGIC: |
+    1. EXECUTE Flow.PrepareNewUser
+    2. SET Schema.User.status = pending
+    3. EMIT user.invited
+  INTERFACE:
+    - REST: POST /users/invite
+}
+
+CONTRACT SuspendUser {
+  INPUT:
+    - userId
+  AUTHZ: admin
+  LOGIC: |
+    1. REQUIRES Schema.User.status == active
+    2. EXECUTE Flow.SuspendAccess
+  INTERFACE:
+    - REST: POST /users/{id}/suspend
+}
+
+CONTRACT ReactivateUser {
+  INPUT:
+    - userId
+  AUTHZ: admin
+  LOGIC: |
+    1. REQUIRES Schema.User.status == suspended
+    2. SET Schema.User.status = active
+    3. EMIT user.reactivated
+  INTERFACE:
+    - REST: POST /users/{id}/reactivate
+}
+
+CONTRACT EditUser {
+  INPUT:
+    - displayName
+    - username
+    - avatarUrl
+    - locale
+  AUTHZ:
+    - admin:any
+    - member:self
+  LOGIC: |
+    1. UPDATE mutable Schema.User fields only
+    2. CALL Storage.ResolveAvatarUrl when avatar changes
+    3. EMIT user.updated
+  INTERFACE:
+    - REST: PATCH /users/{id}
+}
+
+CONTRACT ChangeUserRole {
+  INPUT:
+    - role
+  AUTHZ: admin
+  LOGIC: |
+    1. SET Schema.User.role
+    2. EMIT user.role_changed
+  INTERFACE:
+    - REST: POST /users/{id}/role
+}
+
+CONTRACT DeleteUser {
+  INPUT:
+    - userId
+  AUTHZ: admin
+  LOGIC: |
+    1. EXECUTE Flow.SoftDeleteUser
+  INTERFACE:
+    - REST: DELETE /users/{id}
+}
+
+CONTRACT UsersAPI {
+  LOGIC: |
+    1. GET /users returns list of non-deleted users with role/status/search filters.
+    2. GET /users/{id} returns single user if requester is admin or self.
+    3. All endpoints REQUIRE Auth.ValidateSession.
+  INTERFACE:
+    - REST: GET /users
+    - REST: GET /users/{id}
+    - MCP: serves {Schema.User, Persona.AdminDirectory, Persona.UserProfile}
+}
+
+
+--- users.persona.acl ---
+:::ACL_METADATA
+DOMAIN: juice.users
+CONTEXT: Persona
+VERSION: 1.2.0
+:::
+
+PERSONA Admin {
+  VIEW Directory {
+    DISPLAY:
+      - avatarUrl as avatar
+      - displayName as primary sortable
+      - email sortable
+      - role as badge filterable
+      - status as badge filterable
+      - createdAt as relative-date sortable
+    ACTIONS:
+      - "Open User" -> Contract.UsersAPI(detail)
+      - "Suspend" -> Contract.SuspendUser
+      - "Reactivate" -> Contract.ReactivateUser
+      - "Delete" -> Contract.DeleteUser
+  }
+
+  VIEW UserEditor {
+    DISPLAY:
+      - form.create: [email, displayName, username, role, locale]
+      - form.edit: [displayName, username, avatarUrl, locale]
+    ACTIONS:
+      - "Create User" -> Contract.RegisterUser
+      - "Invite User" -> Contract.InviteUser
+      - "Save Changes" -> Contract.EditUser
+      - "Change Role" -> Contract.ChangeUserRole
+  }
+}
+
+PERSONA Member {
+  VIEW SelfProfile {
+    DISPLAY:
+      - avatarUrl
+      - displayName
+      - email
+      - locale
+      - updatedAt
+    ACTIONS:
+      - "Edit Profile" -> Contract.EditUser
+  }
+}
