@@ -139,11 +139,10 @@ Extract the four context definitions (`Schema`, `Flow`, `Contract`, `Persona`), 
 Using the feature name from the user (e.g., `juice.users`), fetch all four context files from the feature's directory on specdir.com. The subsystem name is the part after the last dot in the feature name (e.g., `users` from `juice.users`):
 
 ```
-https://specdir.com/features/{feature-name}/{subsystem}.schema.acl
-https://specdir.com/features/{feature-name}/{subsystem}.flow.acl
-https://specdir.com/features/{feature-name}/{subsystem}.contract.acl
-https://specdir.com/features/{feature-name}/{subsystem}.persona.acl
+https://specdir.com/features/{feature-name}/bundle.txt
 ```
+
+This single file contains all four context files (Schema, Flow, Contract, Persona) separated by `--- filename ---` markers.
 
 For each file:
 1. Parse the `:::ACL_METADATA` header — extract `DOMAIN`, `CONTEXT`, `VERSION`, and `IMPORT` declarations.
