@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Directory — specdir.com</title>
+  <title>juice.tasks / tasks.contract.acl — specdir.com</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect x=%224%22 y=%224%22 width=%2256%22 height=%2256%22 rx=%2216%22 fill=%22%230b1f2a%22/%3E%3Cpath d=%22M24 18L12 32L24 46%22 stroke=%22%2367e8f9%22 stroke-width=%224.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/%3E%3Cpath d=%22M40 18L52 32L40 46%22 stroke=%22%235eead4%22 stroke-width=%224.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/%3E%3Ccircle cx=%2232%22 cy=%2225%22 r=%222.5%22 fill=%22%23ffffff%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%222.5%22 fill=%22%23ffffff%22/%3E%3Ccircle cx=%2232%22 cy=%2239%22 r=%222.5%22 fill=%22%23ffffff%22/%3E%3C/svg%3E">
   <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -60,7 +60,7 @@
 </head>
 <body>
   <header>
-    <a href="../index.html" class="brand">
+    <a href="../../../index.html" class="brand">
       <img class="brand-mark" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect x=%224%22 y=%224%22 width=%2256%22 height=%2256%22 rx=%2216%22 fill=%22%230b1f2a%22/%3E%3Cpath d=%22M24 18L12 32L24 46%22 stroke=%22%2367e8f9%22 stroke-width=%224.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/%3E%3Cpath d=%22M40 18L52 32L40 46%22 stroke=%22%235eead4%22 stroke-width=%224.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/%3E%3Ccircle cx=%2232%22 cy=%2225%22 r=%222.5%22 fill=%22%23ffffff%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%222.5%22 fill=%22%23ffffff%22/%3E%3Ccircle cx=%2232%22 cy=%2239%22 r=%222.5%22 fill=%22%23ffffff%22/%3E%3C/svg%3E" alt="ACL">
       <span>
         <span class="brand-title">Application Context Language</span>
@@ -68,61 +68,128 @@
     </a>
     <p>Define intent. AI builds the stack.</p>
     <nav>
-      <a href="../index.html" class="">Home</a>
-      <a href="../spec/index.html" class="">Specification</a>
-      <a href="../directory/index.html" class="active">Registry</a>
+      <a href="../../../index.html" class="">Home</a>
+      <a href="../../../spec/index.html" class="">Specification</a>
+      <a href="../../../directory/index.html" class="active">Registry</a>
       <a href="https://github.com/nemicko/specdir">GitHub</a>
-      <a href="../registry.json">registry.json</a>
+      <a href="../../../registry.json">registry.json</a>
     </nav>
   </header>
   <main>
     
-  <h2>Feature Directory</h2>
-  <p style="margin-bottom:1.5rem">
-    2 feature(s) listed. Features are hosted by their authors.
-    <a href="https://github.com/nemicko/specdir/blob/main/CONTRIBUTING.md">Submit a feature -></a>
-  </p>
-  <div class="search">
-    <input type="text" id="search" placeholder="Search features by name, tag, or description..." oninput="filterTable()">
-  </div>
-  <table id="registry">
-    <thead>
-      <tr>
-        <th>Feature</th>
-        <th>Description</th>
-        <th>Author</th>
-        <th>Tags</th>
-        <th>Maturity</th>
-      </tr>
-    </thead>
-    <tbody>
-  <tr>
-    <td><a href="../features/juice.users/index.html">juice.users</a></td>
-    <td>User identity, authentication, roles and lifecycle management.</td>
-    <td>juice</td>
-    <td><span class="tag">identity</span> <span class="tag">auth</span> <span class="tag">admin</span> <span class="tag">core</span></td>
-    <td><span class="badge" style="background:#6b7280;color:#fff">draft</span></td>
-  </tr>
-  <tr>
-    <td><a href="../features/juice.tasks/index.html">juice.tasks</a></td>
-    <td>Basic task management with priorities, assignments, and lifecycle tracking.</td>
-    <td>juice</td>
-    <td><span class="tag">tasks</span> <span class="tag">productivity</span> <span class="tag">demo</span></td>
-    <td><span class="badge" style="background:#6b7280;color:#fff">draft</span></td>
-  </tr></tbody>
-  </table>
-  <p class="meta">Updated 2026-02-23 &middot;
-    <a href="https://github.com/nemicko/specdir">Contribute on GitHub</a>
-  </p>
-  <script>
-    function filterTable() {
-      const q = document.getElementById('search').value.toLowerCase();
-      document.querySelectorAll('#registry tbody tr').forEach(row => {
-        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
-      });
-    }
-  </script>
+    <div class="feature-header">
+      <h2>tasks.contract.acl</h2>
+      <p>Preview for <strong>juice.tasks</strong></p>
+      <div class="actions">
+        <a href="../index.html" class="btn btn-secondary">Back to Feature</a>
+        <a href="../tasks.contract.acl" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">Open Raw File</a>
+        <a href="../tasks.contract.acl" download class="btn btn-secondary">Download</a>
+      </div>
+    </div>
 
+    <pre><code>:::ACL_METADATA
+DOMAIN: juice.tasks
+CONTEXT: Contract
+VERSION: 1.0.0
+:::
+
+CONTRACT CreateTask {
+  DESCRIPTION: &quot;Creates a new task with default todo status.&quot;
+  INPUT:
+    - title
+    - description
+    - priority
+    - assignee
+    - dueDate
+  AUTHZ:
+    - admin:any
+    - member:any
+  LOGIC: |
+    1. EXECUTE Flow.PrepareNewTask
+    2. PERSIST Schema.Task
+    3. EMIT task.created
+  INTERFACE:
+    - REST: POST /tasks
+}
+
+CONTRACT EditTask {
+  DESCRIPTION: &quot;Updates mutable fields on an existing task.&quot;
+  INPUT:
+    - title
+    - description
+    - priority
+    - dueDate
+  AUTHZ:
+    - admin:any
+    - member:self
+  LOGIC: |
+    1. UPDATE mutable Schema.Task fields only
+    2. EMIT task.updated
+  INTERFACE:
+    - REST: PATCH /tasks/{id}
+}
+
+CONTRACT ChangeStatus {
+  DESCRIPTION: &quot;Transitions a task to a new lifecycle status.&quot;
+  INPUT:
+    - status
+  AUTHZ:
+    - admin:any
+    - member:self
+  LOGIC: |
+    1. EXECUTE Flow.TransitionStatus
+  INTERFACE:
+    - REST: POST /tasks/{id}/status
+}
+
+CONTRACT AssignTask {
+  DESCRIPTION: &quot;Sets or clears the assignee on a task.&quot;
+  INPUT:
+    - assignee
+  AUTHZ:
+    - admin:any
+    - member:self
+  LOGIC: |
+    1. SET Schema.Task.assignee
+    2. EMIT task.assigned
+  INTERFACE:
+    - REST: POST /tasks/{id}/assign
+}
+
+CONTRACT ArchiveTask {
+  DESCRIPTION: &quot;Archives a completed task, removing it from active lists.&quot;
+  INPUT:
+    - taskId
+  AUTHZ: admin
+  LOGIC: |
+    1. REQUIRES Schema.Task.status == done
+    2. EXECUTE Flow.ArchiveCompletedTask
+  INTERFACE:
+    - REST: POST /tasks/{id}/archive
+}
+
+CONTRACT DeleteTask {
+  DESCRIPTION: &quot;Soft-deletes a task by archiving it. Data retained for audit.&quot;
+  INPUT:
+    - taskId
+  AUTHZ: admin
+  LOGIC: |
+    1. EXECUTE Flow.SoftDeleteTask
+  INTERFACE:
+    - REST: DELETE /tasks/{id}
+}
+
+CONTRACT TasksAPI {
+  DESCRIPTION: &quot;Read-only endpoints for listing and retrieving tasks.&quot;
+  LOGIC: |
+    1. GET /tasks returns list of non-archived tasks with status/priority/assignee filters.
+    2. GET /tasks/{id} returns single task if requester is admin or assignee.
+  INTERFACE:
+    - REST: GET /tasks
+    - REST: GET /tasks/{id}
+}
+</code></pre>
+  
   </main>
 </body>
 </html>

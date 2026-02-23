@@ -1,0 +1,64 @@
+:::ACL_METADATA
+DOMAIN: juice.tasks
+CONTEXT: Persona
+VERSION: 1.0.0
+:::
+
+PERSONA Admin {
+  DESCRIPTION: "Project lead or manager who oversees all tasks across the team."
+
+  VIEW TaskBoard {
+    DESCRIPTION: "Paginated list of all tasks with filtering, sorting, and bulk actions."
+    DISPLAY:
+      - title as primary sortable
+      - status as badge filterable
+      - priority as badge filterable
+      - assignee filterable
+      - dueDate sortable
+      - createdAt as relative-date sortable
+    ACTIONS:
+      - "Open Task" -> Contract.TasksAPI(detail)
+      - "Change Status" -> Contract.ChangeStatus
+      - "Assign" -> Contract.AssignTask
+      - "Archive" -> Contract.ArchiveTask
+      - "Delete" -> Contract.DeleteTask
+  }
+
+  VIEW TaskEditor {
+    DESCRIPTION: "Form views for creating new tasks and editing existing task details."
+    DISPLAY:
+      - form.create: [title, description, priority, assignee, dueDate]
+      - form.edit: [title, description, priority, dueDate]
+    ACTIONS:
+      - "Create Task" -> Contract.CreateTask
+      - "Save Changes" -> Contract.EditTask
+      - "Assign" -> Contract.AssignTask
+  }
+}
+
+PERSONA Member {
+  DESCRIPTION: "Team member who manages their own assigned tasks."
+
+  VIEW MyTasks {
+    DESCRIPTION: "Filtered view showing only tasks assigned to the current user."
+    DISPLAY:
+      - title as primary sortable
+      - status as badge filterable
+      - priority as badge filterable
+      - dueDate sortable
+      - updatedAt as relative-date sortable
+    ACTIONS:
+      - "Open Task" -> Contract.TasksAPI(detail)
+      - "Change Status" -> Contract.ChangeStatus
+  }
+
+  VIEW TaskEditor {
+    DESCRIPTION: "Form for creating tasks and editing own task details."
+    DISPLAY:
+      - form.create: [title, description, priority, dueDate]
+      - form.edit: [title, description, priority, dueDate]
+    ACTIONS:
+      - "Create Task" -> Contract.CreateTask
+      - "Save Changes" -> Contract.EditTask
+  }
+}

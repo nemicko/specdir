@@ -19,8 +19,22 @@
       ],
       "maturity": "draft",
       "submitted": "2026-02-22"
+    },
+    {
+      "name": "juice.tasks",
+      "description": "Basic task management with priorities, assignments, and lifecycle tracking.",
+      "author": "juice",
+      "domain": "specdir.com",
+      "url": "https://specdir.com/features/juice.tasks/tasks.contract.acl",
+      "tags": [
+        "tasks",
+        "productivity",
+        "demo"
+      ],
+      "maturity": "draft",
+      "submitted": "2026-02-23"
     }
   ],
-  "generated": "2026-02-23T12:34:40.178Z",
-  "count": 1
+  "generated": "2026-02-23T15:17:31.520Z",
+  "count": 2
 }
