@@ -110,6 +110,8 @@ FLOW TouchUpdatedAt {
 DOMAIN: juice.tasks
 CONTEXT: Contract
 VERSION: 1.0.0
+REQUIRES:
+  - acl.identity.UserDirectory@^1.0 AS Identity
 :::
 
 CONTRACT CreateTask {
@@ -169,8 +171,9 @@ CONTRACT AssignTask {
     - admin:any
     - member:self
   LOGIC: |
-    1. SET Schema.Task.assignee
-    2. EMIT task.assigned
+    1. CALL Identity.ResolveUser with assignee
+    2. SET Schema.Task.assignee
+    3. EMIT task.assigned
   INTERFACE:
     - REST: POST /tasks/{id}/assign
 }

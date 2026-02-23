@@ -234,58 +234,101 @@
 
 <p>Every <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">.acl</code> file begins with a metadata header enclosed in <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">:::ACL_METADATA</code> delimiters. This header makes each file self-describing and machine-parseable: it identifies which feature the file belongs to, which context it defines, what version of the definition it represents, and what external dependencies it declares.</p>
 
-<pre><code>:::ACL_METADATA&#10;DOMAIN: juice.users&#10;CONTEXT: Contract&#10;VERSION: 1.2.0&#10;IMPORT:&#10;  - juice.auth.Contract AS Auth&#10;  - juice.storage.Contract AS Storage&#10;:::&#10;</code></pre>
+<pre><code>:::ACL_METADATA&#10;DOMAIN: juice.users&#10;CONTEXT: Contract&#10;VERSION: 1.2.0&#10;IMPORT:&#10;  - juice.auth.Contract AS Auth&#10;  - juice.storage.Contract AS Storage&#10;REQUIRES:&#10;  - acl.identity.UserDirectory@^1.0 AS Identity&#10;:::&#10;</code></pre>
 
 <table><tr><td>Field</td><td>Required</td><td>Purpose</td></tr>
 <p>|-------|----------|---------|</p>
-<tr><td><code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">DOMAIN</code></td><td>Yes</td><td>Feature namespace (<code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">company.subsystem</code>) — identifies which feature this file belongs to</td></tr>
-<tr><td><code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">CONTEXT</code></td><td>Yes</td><td>Which of the four contexts this file defines (<code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Schema</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Flow</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Contract</code>, or <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Persona</code>)</td></tr>
-<tr><td><code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">VERSION</code></td><td>Yes</td><td>SemVer version of this feature definition, enabling change tracking and compatibility checks</td></tr>
-<tr><td><code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">IMPORT</code></td><td>No</td><td>Dependencies on other features' Contracts, declared with an alias for use in the file body</td></tr>
+<tr><td><code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">DOMAIN</code></td><td>Yes</td><td>Namespace (<code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">company.subsystem</code> for feature files, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">local.project</code> for project-local mapping files)</td></tr>
+<tr><td><code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">CONTEXT</code></td><td>Yes</td><td>Context type. Feature files use <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Schema</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Flow</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Contract</code>, or <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Persona</code>. Project-local binding files use <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Mapping</code>.</td></tr>
+<tr><td><code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">VERSION</code></td><td>Yes</td><td>SemVer version of this definition, enabling change tracking and compatibility checks</td></tr>
+<tr><td><code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">IMPORT</code></td><td>No</td><td>Concrete dependencies on other features' Contracts, declared with an alias for use in the file body</td></tr>
+<tr><td><code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">REQUIRES</code></td><td>No</td><td>Abstract capability dependencies with version ranges, declared as <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">capability.path@range AS Alias</code></td></tr>
 <p></table></p>
-<p>The <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">IMPORT</code> field is the mechanism by which features declare their external dependencies. Only Contracts may be imported — never Schemas or Flows. Each import uses the <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">AS</code> keyword to assign a local alias, which keeps references short and avoids naming collisions when multiple features are imported.</p>
+<code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">IMPORT</code> and <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">REQUIRES</code> are complementary:
+
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">IMPORT</code> binds to a known feature Contract (for example, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.users.Contract</code>)</p>
+<p>- <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">REQUIRES</code> declares a capability contract that must be mapped to a concrete provider at implementation time</p>
+
+<p>In both fields, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">AS</code> assigns a local alias used inside <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">CALL Alias.Operation</code> statements.</p>
 
 <hr style="border:none;border-top:1px solid #99f6e4;margin:2rem 0">
 
-<h2>5. Cross-Feature References</h2>
+<h2>5. Capability Dependencies and Project Glue</h2>
+
+<p>Real-world projects often have existing systems (identity, billing, storage, messaging) that ACL features must integrate with. To keep features reusable, ACL allows features to depend on capabilities rather than specific provider implementations.</p>
+
+<code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">REQUIRES</code> expresses this dependency in feature metadata. The implementation environment then binds each capability to a concrete provider using project-local mapping files.
+
+<h3>5.1 Project-Local Mapping Context</h3>
+
+<p>Mapping files live in a local ACL workspace and are not part of a published feature's four contexts.</p>
+
+<p>Recommended layout:</p>
+
+<pre><code>acl/&#10;  modules/&#10;    <installed-feature-bundles>&#10;  mappings/&#10;    project.map.acl&#10;</code></pre>
+
+<p>Example mapping file:</p>
+
+<pre><code>:::ACL_METADATA&#10;DOMAIN: local.project&#10;CONTEXT: Mapping&#10;VERSION: 1.0.0&#10;:::&#10;&#10;MAPPING IdentityBindings {&#10;  CAPABILITY acl.identity.UserDirectory@^1.0 AS Identity&#10;  BIND:&#10;    - TO FEATURE juice.users.Contract@^1.2&#10;    - OPERATION MAP:&#10;      - Identity.ResolveUser -> Users.UsersAPI(detail)&#10;}&#10;</code></pre>
+
+<h3>5.2 Resolution Rules</h3>
+
+<p>When resolving a required capability:</p>
+
+<p>1. Use explicit mappings from <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">acl/mappings/<em>.map.acl</code> first.</p>
+<p>2. Verify semantic version compatibility between the required range and the mapped capability range.</p>
+<p>3. Fail validation/build if no compatible mapping exists.</p>
+<p>4. Fail validation/build if multiple compatible mappings exist for the same requirement and no single explicit binding is chosen.</p>
+
+<p>These rules prevent implicit, unstable bindings and make integration choices auditable.</p>
+
+<hr style="border:none;border-top:1px solid #99f6e4;margin:2rem 0">
+
+<h2>6. Cross-Feature References</h2>
 
 <p>Encapsulation is a first-class concern in ACL. A feature's Schema and Flow are private — they define internal structure and behavior that may change at any time without notice. No other feature is permitted to reference them directly. This rule prevents tight coupling: if <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.billing</code> could read <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.users</code>'s Schema directly, any change to the User entity's field names or types could silently break the billing feature.</p>
 
-<p>The only cross-feature surface is the <strong>Contract</strong>. When one feature needs data or behavior from another, it imports that feature's Contract and calls its operations. The Contract acts as a stable interface that the owning feature is responsible for maintaining.</p>
+<p>The only cross-feature surface is the <strong>Contract</strong>. A feature may either:</p>
 
-<p>In practice, this looks like the following. The <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.users</code> Contract file declares its imports in the metadata header:</p>
+<p>- import a concrete Contract via <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">IMPORT</code>, or</p>
+<p>- call a capability alias declared in <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">REQUIRES</code>, which must be mapped locally.</p>
 
-<pre><code>IMPORT:&#10;  - juice.auth.Contract AS Auth&#10;  - juice.storage.Contract AS Storage&#10;</code></pre>
+<p>In practice, this looks like:</p>
 
-<p>Within the Contract body, these imports are referenced by their alias:</p>
+<pre><code>IMPORT:&#10;  - juice.storage.Contract AS Storage&#10;REQUIRES:&#10;  - acl.identity.UserDirectory@^1.0 AS Identity&#10;</code></pre>
 
-<pre><code>LOGIC: |&#10;  1. CALL Storage.ResolveAvatarUrl when avatar changes&#10;</code></pre>
+<p>Within a Contract body:</p>
 
-<pre><code>LOGIC: |&#10;  1. All endpoints REQUIRE Auth.ValidateSession.&#10;</code></pre>
+<pre><code>LOGIC: |&#10;  1. CALL Storage.ResolveAvatarUrl when avatar changes&#10;  2. CALL Identity.ResolveUser with assignee&#10;</code></pre>
 
-<p>The <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">AS</code> keyword assigns a readable shorthand (<code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Auth</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Storage</code>) that avoids repeating the full <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">juice.auth.Contract</code> path and prevents collisions if two imported features happen to expose operations with the same name.</p>
+<p>The <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">AS</code> keyword assigns readable shorthands (<code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Storage</code>, <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">Identity</code>) that avoid repeating long paths and prevent collisions when multiple dependencies are present.</p>
 
 <hr style="border:none;border-top:1px solid #99f6e4;margin:2rem 0">
 
-<h2>6. AI Execution Model</h2>
+<h2>7. AI Execution Model</h2>
 
 <p>ACL files are designed to be consumed programmatically — by AI agents, code generators, or implementation tools that translate the specification into working software. The execution model describes the expected sequence of operations when an AI system processes an ACL feature set.</p>
 
-<h3>6.1 Parse and Map</h3>
+<h3>7.1 Parse and Map</h3>
 
-<p>The agent reads all <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">.acl</code> files in the feature directory, parses their metadata headers, and resolves <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">IMPORT</code> declarations to build a dependency graph. At the end of this step, the agent has a complete picture of every feature, every context, and every cross-feature relationship in the system.</p>
+<p>The agent reads all <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">.acl</code> files in the feature directory, parses metadata headers, and builds a dependency graph from both <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">IMPORT</code> and <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">REQUIRES</code> declarations.</p>
 
-<h3>6.2 Detect Environment</h3>
+<h3>7.2 Resolve Capability Bindings</h3>
+
+<p>Before synthesis, the agent loads project-local mapping files from <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">acl/mappings/</em>.map.acl</code> and resolves each <code style="background:#ccfbf1;padding:2px 6px;border-radius:4px;font-size:0.85em">REQUIRES</code> declaration to exactly one compatible provider. Missing or ambiguous bindings are hard errors.</p>
+
+<h3>7.3 Detect Environment</h3>
 
 <p>The agent determines the target environment — programming language, framework, database, authentication provider — either from explicit configuration or by inspecting the existing project. This step is what makes ACL language-agnostic: the same feature definition produces a Rails migration, a Django model, or a Prisma schema depending on the detected environment.</p>
 
-<h3>6.3 Synthesize</h3>
+<h3>7.4 Synthesize</h3>
 
 <p>For a new (greenfield) project, the agent generates all implementation artifacts from scratch: data models from Schemas, service layers from Flows and Contracts, API routes from Contract interfaces, and UI components from Personas. For an existing (brownfield) project, the agent generates adapter layers that map ACL definitions onto the project's existing code, data, and conventions — preserving what already works while filling in what the specification requires.</p>
 
-<h3>6.4 Verify Integrity</h3>
+<h3>7.5 Verify Integrity</h3>
 
-<p>The agent checks that the Binding Rule holds end-to-end: every Persona action maps to a Contract, every Contract references at least one Flow or Schema effect, and every imported Contract resolves to a real feature. This verification step catches specification gaps before they become implementation bugs.</p>
+<p>The agent checks that the Binding Rule holds end-to-end: every Persona action maps to a Contract, every Contract references at least one Flow or Schema effect, every imported Contract resolves to a real feature, and every required capability resolves to exactly one mapped provider.</p>
+<p>This verification step catches specification gaps before they become implementation bugs.</p>
 
   </div>
 
