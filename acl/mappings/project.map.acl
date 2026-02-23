@@ -1,0 +1,13 @@
+:::ACL_METADATA
+DOMAIN: local.project
+CONTEXT: Mapping
+VERSION: 1.0.0
+:::
+
+MAPPING IdentityBindings {
+  CAPABILITY acl.identity.UserDirectory@^1.0 AS Identity
+  BIND:
+    - TO FEATURE juice.users.Contract@^1.2
+    - OPERATION MAP:
+      - Identity.ResolveUser -> Users.UsersAPI(detail)
+}

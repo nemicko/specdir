@@ -48,7 +48,7 @@ In any `.acl` file, import a Feature Contract:
 
 ```acl
 :::ACL_METADATA
-FEATURE: acme.billing
+DOMAIN: acme.billing
 CONTEXT: Contract
 VERSION: 1.2.0
 IMPORT:
@@ -61,6 +61,29 @@ Tell your AI agent to integrate it:
 > "Integrate the `juice.users` ACL Feature into this application and preserve ACL boundaries."
 
 The agent parses the feature graph and generates or adapts implementation against your stack.
+
+If a feature depends on a capability instead of a concrete provider, declare it with `REQUIRES`:
+
+```acl
+:::ACL_METADATA
+DOMAIN: acme.tasks
+CONTEXT: Contract
+VERSION: 1.2.0
+REQUIRES:
+  - acl.identity.UserDirectory@^1.0 AS Identity
+:::
+```
+
+Map required capabilities in project-local ACL files:
+
+```text
+acl/
+  modules/
+  mappings/
+    project.map.acl
+```
+
+`project.map.acl` binds required capabilities to either installed ACL features or project-native adapters.
 
 ---
 

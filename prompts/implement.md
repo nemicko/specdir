@@ -16,7 +16,7 @@ Fetch the ACL protocol spec:
 {{SPEC_URL}}
 ```
 
-Extract the four context definitions (`Schema`, `Flow`, `Contract`, `Persona`), the Binding Rule, the metadata format (`DOMAIN`, `CONTEXT`, `VERSION`, `IMPORT`), and the cross-feature encapsulation rules. This is the protocol — treat it as authoritative for all terminology and structural requirements.
+Extract the four context definitions (`Schema`, `Flow`, `Contract`, `Persona`), the Binding Rule, the metadata format (`DOMAIN`, `CONTEXT`, `VERSION`, `IMPORT`, `REQUIRES`), and the cross-feature encapsulation rules. This is the protocol — treat it as authoritative for all terminology and structural requirements.
 
 ## Step 2: Fetch and Parse the Feature Definition
 
@@ -27,11 +27,13 @@ https://specdir.com/features/{{FEATURE_NAME}}/bundle.txt
 ```
 
 This single file contains all four context files (Schema, Flow, Contract, Persona) separated by `--- filename ---` markers. Split the bundle on these markers to extract each context file, then for each one:
-1. Parse the `:::ACL_METADATA` header — extract `DOMAIN`, `CONTEXT`, `VERSION`, and `IMPORT` declarations.
-2. Build the dependency graph from all `IMPORT` lines. Each import names another feature's Contract and assigns it a local alias.
+1. Parse the `:::ACL_METADATA` header — extract `DOMAIN`, `CONTEXT`, `VERSION`, `IMPORT`, and `REQUIRES` declarations.
+2. Build the dependency graph from both `IMPORT` and `REQUIRES` lines. `IMPORT` names concrete feature Contracts. `REQUIRES` names abstract capabilities with version ranges and local aliases.
 3. Parse the body into structured declarations (`SCHEMA`, `FLOW`, `CONTRACT`, `PERSONA`).
 
 **Do not generate code until all four files are parsed.** The contexts reference each other and incomplete parsing leads to broken output.
+
+Before generating code, load project-local mapping files from `acl/mappings/*.map.acl` and resolve each `REQUIRES` capability to exactly one compatible provider (feature Contract or project adapter). Missing or ambiguous bindings are specification errors.
 
 ## Step 3: Confirm the Target Environment
 
@@ -95,7 +97,7 @@ For each `CONTRACT`, produce:
    - `SET Schema.X.field` → targeted field update on the entity
    - `REQUIRES condition` → precondition guard; reject with appropriate error if unmet
    - `UPDATE mutable Schema.X fields only` → apply input to all mutable fields (exclude `IMMUTABLE` fields)
-5. **Import adapters** — for each `IMPORT` in the metadata, generate a client interface, adapter, or service stub that the handler can call. This is the cross-feature integration point.
+5. **Dependency adapters** — for each `IMPORT` and resolved `REQUIRES` capability, generate a client interface, adapter, or service stub that the handler can call. This is the cross-feature integration point.
 
 **Rule:** Contracts are the only public surface of a feature. Never expose Schema models or Flow functions directly to external callers or other features.
 
@@ -124,7 +126,7 @@ Run three verification passes against your generated output:
 
 2. **Reverse trace** — for every Schema field referenced in a Contract's `INPUT`, `LOGIC`, or a Persona's `DISPLAY`, confirm the field actually exists in the Schema definition. Flag any reference to a field that is not declared.
 
-3. **Cross-feature trace** — for every `IMPORT` in the metadata, confirm your generated code includes a corresponding client interface, adapter, or stub. For every `CALL Alias.Operation` in Contract logic, confirm the call is wired to the import adapter.
+3. **Cross-feature trace** — for every `IMPORT` and `REQUIRES` dependency, confirm your generated code includes a corresponding client interface, adapter, or stub. For every `CALL Alias.Operation` in Contract logic, confirm the call is wired to the correct dependency adapter and mapped provider.
 
 If any link is broken, report it as a specification gap and ask the user how to proceed. Do not silently fill gaps with assumptions.
 
@@ -134,6 +136,7 @@ When the user has an existing project:
 
 - Preserve existing architecture, naming conventions, and file structure. Do not reorganize the project.
 - Generate adapter layers that bridge ACL Contract endpoints to existing code paths.
+- Load `acl/mappings/*.map.acl` and honor explicit capability bindings before attempting any auto-resolution.
 - When existing models overlap with Schema entities, extend them with missing fields and constraints rather than replacing them.
 - Map Contract `INTERFACE` endpoints to the project's existing routing patterns and middleware stack.
 - Reuse existing authentication, authorization, and event systems rather than introducing new ones.

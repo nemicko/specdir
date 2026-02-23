@@ -318,66 +318,130 @@ VERSION: 1.2.0
 IMPORT:
   - juice.auth.Contract AS Auth
   - juice.storage.Contract AS Storage
+REQUIRES:
+  - acl.identity.UserDirectory@^1.0 AS Identity
 :::
 ```
 
 | Field | Required | Purpose |
 |-------|----------|---------|
-| `DOMAIN` | Yes | Feature namespace (`company.subsystem`) — identifies which feature this file belongs to |
-| `CONTEXT` | Yes | Which of the four contexts this file defines (`Schema`, `Flow`, `Contract`, or `Persona`) |
-| `VERSION` | Yes | SemVer version of this feature definition, enabling change tracking and compatibility checks |
-| `IMPORT` | No | Dependencies on other features' Contracts, declared with an alias for use in the file body |
+| `DOMAIN` | Yes | Namespace (`company.subsystem` for feature files, `local.project` for project-local mapping files) |
+| `CONTEXT` | Yes | Context type. Feature files use `Schema`, `Flow`, `Contract`, or `Persona`. Project-local binding files use `Mapping`. |
+| `VERSION` | Yes | SemVer version of this definition, enabling change tracking and compatibility checks |
+| `IMPORT` | No | Concrete dependencies on other features' Contracts, declared with an alias for use in the file body |
+| `REQUIRES` | No | Abstract capability dependencies with version ranges, declared as `capability.path@range AS Alias` |
 
-The `IMPORT` field is the mechanism by which features declare their external dependencies. Only Contracts may be imported — never Schemas or Flows. Each import uses the `AS` keyword to assign a local alias, which keeps references short and avoids naming collisions when multiple features are imported.
+`IMPORT` and `REQUIRES` are complementary:
+
+- `IMPORT` binds to a known feature Contract (for example, `juice.users.Contract`)
+- `REQUIRES` declares a capability contract that must be mapped to a concrete provider at implementation time
+
+In both fields, `AS` assigns a local alias used inside `CALL Alias.Operation` statements.
 
 ---
 
-## 5. Cross-Feature References
+## 5. Capability Dependencies and Project Glue
+
+Real-world projects often have existing systems (identity, billing, storage, messaging) that ACL features must integrate with. To keep features reusable, ACL allows features to depend on capabilities rather than specific provider implementations.
+
+`REQUIRES` expresses this dependency in feature metadata. The implementation environment then binds each capability to a concrete provider using project-local mapping files.
+
+### 5.1 Project-Local Mapping Context
+
+Mapping files live in a local ACL workspace and are not part of a published feature's four contexts.
+
+Recommended layout:
+
+```text
+acl/
+  modules/
+    <installed-feature-bundles>
+  mappings/
+    project.map.acl
+```
+
+Example mapping file:
+
+```acl
+:::ACL_METADATA
+DOMAIN: local.project
+CONTEXT: Mapping
+VERSION: 1.0.0
+:::
+
+MAPPING IdentityBindings {
+  CAPABILITY acl.identity.UserDirectory@^1.0 AS Identity
+  BIND:
+    - TO FEATURE juice.users.Contract@^1.2
+    - OPERATION MAP:
+      - Identity.ResolveUser -> Users.UsersAPI(detail)
+}
+```
+
+### 5.2 Resolution Rules
+
+When resolving a required capability:
+
+1. Use explicit mappings from `acl/mappings/*.map.acl` first.
+2. Verify semantic version compatibility between the required range and the mapped capability range.
+3. Fail validation/build if no compatible mapping exists.
+4. Fail validation/build if multiple compatible mappings exist for the same requirement and no single explicit binding is chosen.
+
+These rules prevent implicit, unstable bindings and make integration choices auditable.
+
+---
+
+## 6. Cross-Feature References
 
 Encapsulation is a first-class concern in ACL. A feature's Schema and Flow are private — they define internal structure and behavior that may change at any time without notice. No other feature is permitted to reference them directly. This rule prevents tight coupling: if `juice.billing` could read `juice.users`'s Schema directly, any change to the User entity's field names or types could silently break the billing feature.
 
-The only cross-feature surface is the **Contract**. When one feature needs data or behavior from another, it imports that feature's Contract and calls its operations. The Contract acts as a stable interface that the owning feature is responsible for maintaining.
+The only cross-feature surface is the **Contract**. A feature may either:
 
-In practice, this looks like the following. The `juice.users` Contract file declares its imports in the metadata header:
+- import a concrete Contract via `IMPORT`, or
+- call a capability alias declared in `REQUIRES`, which must be mapped locally.
+
+In practice, this looks like:
 
 ```acl
 IMPORT:
-  - juice.auth.Contract AS Auth
   - juice.storage.Contract AS Storage
+REQUIRES:
+  - acl.identity.UserDirectory@^1.0 AS Identity
 ```
 
-Within the Contract body, these imports are referenced by their alias:
+Within a Contract body:
 
 ```acl
 LOGIC: |
   1. CALL Storage.ResolveAvatarUrl when avatar changes
+  2. CALL Identity.ResolveUser with assignee
 ```
 
-```acl
-LOGIC: |
-  1. All endpoints REQUIRE Auth.ValidateSession.
-```
-
-The `AS` keyword assigns a readable shorthand (`Auth`, `Storage`) that avoids repeating the full `juice.auth.Contract` path and prevents collisions if two imported features happen to expose operations with the same name.
+The `AS` keyword assigns readable shorthands (`Storage`, `Identity`) that avoid repeating long paths and prevent collisions when multiple dependencies are present.
 
 ---
 
-## 6. AI Execution Model
+## 7. AI Execution Model
 
 ACL files are designed to be consumed programmatically — by AI agents, code generators, or implementation tools that translate the specification into working software. The execution model describes the expected sequence of operations when an AI system processes an ACL feature set.
 
-### 6.1 Parse and Map
+### 7.1 Parse and Map
 
-The agent reads all `.acl` files in the feature directory, parses their metadata headers, and resolves `IMPORT` declarations to build a dependency graph. At the end of this step, the agent has a complete picture of every feature, every context, and every cross-feature relationship in the system.
+The agent reads all `.acl` files in the feature directory, parses metadata headers, and builds a dependency graph from both `IMPORT` and `REQUIRES` declarations.
 
-### 6.2 Detect Environment
+### 7.2 Resolve Capability Bindings
+
+Before synthesis, the agent loads project-local mapping files from `acl/mappings/*.map.acl` and resolves each `REQUIRES` declaration to exactly one compatible provider. Missing or ambiguous bindings are hard errors.
+
+### 7.3 Detect Environment
 
 The agent determines the target environment — programming language, framework, database, authentication provider — either from explicit configuration or by inspecting the existing project. This step is what makes ACL language-agnostic: the same feature definition produces a Rails migration, a Django model, or a Prisma schema depending on the detected environment.
 
-### 6.3 Synthesize
+### 7.4 Synthesize
 
 For a new (greenfield) project, the agent generates all implementation artifacts from scratch: data models from Schemas, service layers from Flows and Contracts, API routes from Contract interfaces, and UI components from Personas. For an existing (brownfield) project, the agent generates adapter layers that map ACL definitions onto the project's existing code, data, and conventions — preserving what already works while filling in what the specification requires.
 
-### 6.4 Verify Integrity
+### 7.5 Verify Integrity
 
-The agent checks that the Binding Rule holds end-to-end: every Persona action maps to a Contract, every Contract references at least one Flow or Schema effect, and every imported Contract resolves to a real feature. This verification step catches specification gaps before they become implementation bugs.
+The agent checks that the Binding Rule holds end-to-end: every Persona action maps to a Contract, every Contract references at least one Flow or Schema effect, every imported Contract resolves to a real feature, and every required capability resolves to exactly one mapped provider.
+This verification step catches specification gaps before they become implementation bugs.
