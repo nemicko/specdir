@@ -1,10 +1,10 @@
-# Implement {{FEATURE_NAME}}
+# Implement an ACL Feature
 
 ## What You Are Building
 
 Application Context Language (ACL) is a declarative specification format for product features. Each feature is defined in four context files — `Schema`, `Flow`, `Contract`, and `Persona` — that together describe its data shape, internal mechanisms, public interface, and user experience. ACL is language-agnostic: the same definition produces working code in any stack.
 
-You are implementing **{{FEATURE_NAME}}**: {{FEATURE_DESCRIPTION}}
+Ask the user which Feature they want to implement, then look it up in the directory at `https://specdir.com/registry.json`.
 
 Your job is to translate the four `.acl` files for this feature into working code in the user's technology stack. Every declaration in the spec must produce a concrete artifact. The governing rule is the **Binding Rule**: `Persona → Contract → Flow / Schema`. Every user-visible action maps to a Contract, and every Contract maps to at least one Flow or Schema effect.
 
@@ -13,20 +13,20 @@ Your job is to translate the four `.acl` files for this feature into working cod
 Fetch the ACL protocol spec:
 
 ```
-{{SPEC_URL}}
+https://specdir.com/spec
 ```
 
 Extract the four context definitions (`Schema`, `Flow`, `Contract`, `Persona`), the Binding Rule, the metadata format (`DOMAIN`, `CONTEXT`, `VERSION`, `IMPORT`), and the cross-feature encapsulation rules. This is the protocol — treat it as authoritative for all terminology and structural requirements.
 
 ## Step 2: Fetch and Parse the Feature Definition
 
-Fetch all four context files:
+Using the feature name from the user (e.g., `juice.users`), fetch all four context files from the feature's directory on specdir.com. The subsystem name is the part after the last dot in the feature name (e.g., `users` from `juice.users`):
 
 ```
-{{FEATURE_BASE_URL}}/{{SUBSYSTEM}}.schema.acl
-{{FEATURE_BASE_URL}}/{{SUBSYSTEM}}.flow.acl
-{{FEATURE_BASE_URL}}/{{SUBSYSTEM}}.contract.acl
-{{FEATURE_BASE_URL}}/{{SUBSYSTEM}}.persona.acl
+https://specdir.com/features/{feature-name}/{subsystem}.schema.acl
+https://specdir.com/features/{feature-name}/{subsystem}.flow.acl
+https://specdir.com/features/{feature-name}/{subsystem}.contract.acl
+https://specdir.com/features/{feature-name}/{subsystem}.persona.acl
 ```
 
 For each file:
@@ -147,9 +147,9 @@ When the user has an existing project:
 If you cannot fetch URLs, ask the user to paste the following content in order:
 
 1. The ACL specification (from `spec/README.md`), or confirm proceeding without it
-2. The Schema file: `{{SUBSYSTEM}}.schema.acl`
-3. The Flow file: `{{SUBSYSTEM}}.flow.acl`
-4. The Contract file: `{{SUBSYSTEM}}.contract.acl`
-5. The Persona file: `{{SUBSYSTEM}}.persona.acl`
+2. The Schema file (`.schema.acl`) for the chosen feature
+3. The Flow file (`.flow.acl`) for the chosen feature
+4. The Contract file (`.contract.acl`) for the chosen feature
+5. The Persona file (`.persona.acl`) for the chosen feature
 
 Once all content is provided, proceed from Step 3 (Confirm the Target Environment).

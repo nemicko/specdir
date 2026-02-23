@@ -13,6 +13,9 @@ const features = registry.features || [];
 const promptTemplate = fs.existsSync('./prompts/implement.md')
   ? fs.readFileSync('./prompts/implement.md', 'utf8')
   : '';
+const genericPrompt = fs.existsSync('./prompts/implement-generic.md')
+  ? escapeHtml(fs.readFileSync('./prompts/implement-generic.md', 'utf8'))
+  : '';
 
 const maturityStyle = {
   draft: 'background:#6b7280;color:#fff',
@@ -185,6 +188,23 @@ const homePage = layout(
     <li><strong>Verify</strong> consistency — every user action maps to a Contract, every Contract is backed by a Flow or Schema.</li>
   </ul>
 
+  <h2>Get Started</h2>
+  <p>Copy this prompt into your AI coding tool (Claude Code, Cursor, Copilot, etc.), tell it which Feature to build, and it handles the rest.</p>
+  <div class="prompt-wrap">
+    <button class="copy-btn" onclick="copyPrompt()">Copy</button>
+    <pre id="prompt-text"><code>${genericPrompt}</code></pre>
+  </div>
+  <script>
+    function copyPrompt() {
+      const text = document.getElementById('prompt-text').textContent;
+      navigator.clipboard.writeText(text).then(function() {
+        var btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+      });
+    }
+  </script>
+
   <h2>Open Feature Directory</h2>
   <p>This is an open registry of ACL Features anyone can read, import, and implement. AI agents can fetch the full registry programmatically:</p>
   <pre><code>GET https://specdir.com/registry.yaml
@@ -302,8 +322,18 @@ function generateFeaturePage(feature) {
   const alias = feature.name.split('.').pop().replace(/[^a-zA-Z0-9]/g, '');
   const usageSample = `:::ACL_METADATA\nDOMAIN: acme.billing\nCONTEXT: Contract\nVERSION: 1.2.0\nIMPORT:\n  - ${feature.name}.Contract AS ${alias.charAt(0).toUpperCase() + alias.slice(1)}\n:::`;
 
+  const subsystem = feature.name.split('.').pop();
+  const featureBaseUrl = `https://specdir.com/features/${feature.name}`;
   const prompt = promptTemplate
-    ? escapeHtml(promptTemplate.replace(/\{\{FEATURE_URL\}\}/g, feature.url))
+    ? escapeHtml(
+        promptTemplate
+          .replace(/\{\{FEATURE_URL\}\}/g, feature.url)
+          .replace(/\{\{FEATURE_NAME\}\}/g, feature.name)
+          .replace(/\{\{FEATURE_DESCRIPTION\}\}/g, feature.description || '')
+          .replace(/\{\{FEATURE_BASE_URL\}\}/g, featureBaseUrl)
+          .replace(/\{\{SPEC_URL\}\}/g, 'https://specdir.com/spec')
+          .replace(/\{\{SUBSYSTEM\}\}/g, subsystem)
+      )
     : '';
 
   const promptSection = prompt

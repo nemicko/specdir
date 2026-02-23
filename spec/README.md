@@ -41,6 +41,7 @@ A Schema defines what a feature's data looks like at rest. It describes entities
 **Properties:**
 
 - `SCHEMA` — declares a named entity
+- `DESCRIPTION` — *(optional)* a natural-language summary of the entity's purpose. May also appear on individual attributes to describe their meaning or intent.
 - `ATTRIBUTES` — lists the entity's fields, each with a type and optional modifiers (`required`, `optional`, `unique`, `generated`, `immutable`, `default(...)`, `min(...)`, `max(...)`, `pattern(...)`, `enum(...)`)
 - `RELATIONSHIPS` — describes associations between entities (`hasOne`, `hasMany`, with cardinality and loading hints)
 - `CONSTRAINTS` — natural-language business rules that constrain data integrity
@@ -50,14 +51,20 @@ A Schema defines what a feature's data looks like at rest. It describes entities
 
 ```acl
 SCHEMA User {
+  DESCRIPTION: "Core identity record representing a platform user account."
+
   ATTRIBUTES:
     id: uuid required generated immutable
+      DESCRIPTION: "Globally unique identifier assigned at creation."
     email: email required unique immutable
+      DESCRIPTION: "Primary login credential and notification address."
     username: string unique min(3) max(32) pattern("^[a-zA-Z0-9_]+$")
     displayName: string required min(1) max(64)
     avatarUrl: url optional
     role: enum(admin, member, guest) required default(member)
+      DESCRIPTION: "Determines authorization scope across the platform."
     status: enum(active, suspended, pending, deleted) required default(active)
+      DESCRIPTION: "Lifecycle state governing account access and visibility."
     locale: locale optional default("en")
     createdAt: datetime required generated immutable
     updatedAt: datetime required generated
@@ -91,6 +98,7 @@ Each Flow declares a `TRIGGER` (the event that starts it), optional precondition
 **Properties:**
 
 - `FLOW` — declares a named internal procedure
+- `DESCRIPTION` — *(optional)* a natural-language summary of what this flow accomplishes and when it runs
 - `TRIGGER` — the event or contract invocation that activates this flow (e.g., `Contract.RegisterUser`, `Internal.IdentityVerified`, `Schema.User.updated`)
 - `REQUIRES` — preconditions that must hold before execution
 - `STEPS` — ordered operations, which may include state changes and `Emit DomainEvent` statements
@@ -99,6 +107,7 @@ Each Flow declares a `TRIGGER` (the event that starts it), optional precondition
 
 ```acl
 FLOW PrepareNewUser {
+  DESCRIPTION: "Normalizes input and applies initial state for newly created user accounts."
   TRIGGER: Contract.RegisterUser | Contract.InviteUser
   STEPS:
     1. Normalize email and username.
@@ -108,6 +117,7 @@ FLOW PrepareNewUser {
 }
 
 FLOW SuspendAccess {
+  DESCRIPTION: "Deactivates a user account and revokes all active sessions."
   TRIGGER: Contract.SuspendUser
   REQUIRES:
     - Schema.User.status == active
@@ -131,6 +141,7 @@ Contracts are the *only* cross-feature boundary. When one feature needs to inter
 **Properties:**
 
 - `CONTRACT` — declares a named external operation
+- `DESCRIPTION` — *(optional)* a natural-language summary of the operation's purpose and behavior
 - `INPUT` — the data required to invoke this operation
 - `AUTHZ` — authorization rules (e.g., `admin`, `member:self`, `admin:any`)
 - `LOGIC` — ordered steps describing what happens on invocation; uses keywords:
@@ -147,6 +158,7 @@ Contracts are the *only* cross-feature boundary. When one feature needs to inter
 
 ```acl
 CONTRACT RegisterUser {
+  DESCRIPTION: "Creates a new user account with pending verification status."
   INPUT:
     - email
     - displayName
@@ -162,6 +174,7 @@ CONTRACT RegisterUser {
 }
 
 CONTRACT EditUser {
+  DESCRIPTION: "Updates mutable profile fields for an existing user."
   INPUT:
     - displayName
     - username
@@ -179,6 +192,7 @@ CONTRACT EditUser {
 }
 
 CONTRACT ChangeUserRole {
+  DESCRIPTION: "Reassigns a user's platform role. Admin-only operation."
   INPUT:
     - role
   AUTHZ: admin
@@ -205,6 +219,7 @@ Each Persona is scoped to a user role (e.g., `Admin`, `Member`) and contains one
 **Properties:**
 
 - `PERSONA` — declares a named user role
+- `DESCRIPTION` — *(optional)* a natural-language summary of this persona's role and responsibilities. May also appear on individual `VIEW` blocks to describe their purpose.
 - `VIEW` — declares a named screen or interface within that role's experience
 - `DISPLAY` — lists the data fields shown, with optional modifiers:
   - `as [label]` — presentation hint (e.g., `as badge`, `as avatar`, `as primary`, `as relative-date`)
@@ -217,7 +232,10 @@ Each Persona is scoped to a user role (e.g., `Admin`, `Member`) and contains one
 
 ```acl
 PERSONA Admin {
+  DESCRIPTION: "Back-office operator who manages user accounts and platform settings."
+
   VIEW Directory {
+    DESCRIPTION: "Paginated list of all users with filtering, sorting, and bulk actions."
     DISPLAY:
       - avatarUrl as avatar
       - displayName as primary sortable
@@ -233,6 +251,7 @@ PERSONA Admin {
   }
 
   VIEW UserEditor {
+    DESCRIPTION: "Form views for creating new users and editing existing user profiles."
     DISPLAY:
       - form.create: [email, displayName, username, role, locale]
       - form.edit: [displayName, username, avatarUrl, locale]
@@ -244,7 +263,10 @@ PERSONA Admin {
 }
 
 PERSONA Member {
+  DESCRIPTION: "Authenticated end-user who manages their own profile."
+
   VIEW SelfProfile {
+    DESCRIPTION: "Read-only profile summary with an edit action."
     DISPLAY:
       - avatarUrl
       - displayName
