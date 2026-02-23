@@ -138,8 +138,8 @@ function layout(title, activePage, content, depth = 0) {
     <p>Define intent. AI builds the stack.</p>
     <nav>
       <a href="${root}/index.html" class="${activePage === 'home' ? 'active' : ''}">Home</a>
-      <a href="${root}/directory/index.html" class="${activePage === 'directory' ? 'active' : ''}">Directory</a>
-      <a href="${root}/spec/index.html" class="${activePage === 'spec' ? 'active' : ''}">ACL Spec</a>
+      <a href="${root}/spec/index.html" class="${activePage === 'spec' ? 'active' : ''}">Specification</a>
+      <a href="${root}/directory/index.html" class="${activePage === 'directory' ? 'active' : ''}">Registry</a>
       <a href="${REPO_URL}">GitHub</a>
       <a href="${root}/registry.json">registry.json</a>
     </nav>
